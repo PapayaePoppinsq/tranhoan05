@@ -1,0 +1,17 @@
+{
+  "name": "backend",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch src/index.js --demo",
+    "start": "node src/index.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@payos/node": "^2.0.0",
+    "csv-parse": "^7.0.3",
+    "express": "^5.0.0",
+    "express-rate-limit": "^8.0.0",
+    "zod": "^4.0.0"
+  }
+}

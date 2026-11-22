@@ -1,0 +1,14 @@
+{
+  "name": "san-vot-pickleball",
+  "private": true,
+  "workspaces": ["frontend", "backend"],
+  "engines": {"node": ">=24"},
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "dev:web": "npm run dev -w frontend",
+    "dev:api": "npm run dev -w backend",
+    "build": "npm run build -w frontend",
+    "start": "npm run start -w backend",
+    "test": "npm run test -w backend"
+  }
+}

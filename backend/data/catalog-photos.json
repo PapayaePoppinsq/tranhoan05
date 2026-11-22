@@ -1,0 +1,202 @@
+[
+  {
+    "id": 1,
+    "name": "Sân Vin Pickleball Thanh Niên 2",
+    "address": "Ngõ 31 Phú Thái, Phường Tân Thịnh, TP. Thái Nguyên",
+    "cover": "/images/san-thuc-te/1-4fc94bd2831e.jpg",
+    "source": "https://media.sportnet.vn/venue/2168/banner-san-pickleball-vin-thanh-nien-2-1761124322.jpeg",
+    "imageUrl": "https://media.sportnet.vn/venue/2168/banner-san-pickleball-vin-thanh-nien-2-1761124322.jpeg"
+  },
+  {
+    "id": 2,
+    "name": "Pickleball Thái Nguyên Xanh",
+    "address": "HRVQ+3PG, Tổ 1, KDC số 10, Phường Phan Đình Phùng, TP. Thái Nguyên",
+    "cover": null,
+    "source": null,
+    "note": "CSV chỉ có thẻ giới thiệu Lool.vn."
+  },
+  {
+    "id": 3,
+    "name": "Sân Pickleball Nguyễn Trãi",
+    "address": "HRQV+R8V, Ngõ 158 Phan Đình Phùng, Phường Phan Đình Phùng, TP. Thái Nguyên",
+    "cover": "/images/san-thuc-te/3-0953e59a81a2.jpg",
+    "source": "https://media.sportnet.vn/venue/2165/banner-san-pickleball-nguyen-trai-1761123298.jpeg",
+    "imageUrl": "https://media.sportnet.vn/venue/2165/banner-san-pickleball-nguyen-trai-1761123298.jpeg"
+  },
+  {
+    "id": 4,
+    "name": "CLB Pickleball Quyết Thắng",
+    "address": "Đê Nông Lâm, Phường Quyết Thắng, TP. Thái Nguyên",
+    "cover": "/images/san-thuc-te/4-0d494a8bb10a.webp",
+    "source": "https://shopvnb.com/san-pickleball-quyet-thang.html",
+    "imageUrl": "https://cdn.shopvnb.com/uploads/images/bai_viet/san-pickleball-quyet-thang-1-1734400635.webp"
+  },
+  {
+    "id": 5,
+    "name": "Nông Lâm Pickleball (ĐH Nông Lâm)",
+    "address": "HRW6+24V, Đường Z115, Phường Quyết Thắng, TP. Thái Nguyên",
+    "cover": "/images/san-thuc-te/5-be838f3be925.webp",
+    "source": "https://shopvnb.com/san-pickleball-thai-nguyen.html",
+    "imageUrl": "https://cdn.shopvnb.com/uploads/images/tin_tuc/san-pickleball-thai-nguyen-2-1722825278.webp"
+  },
+  {
+    "id": 6,
+    "name": "Sân Pickleball An Happy",
+    "address": "Đường Việt Bắc, Phường Đồng Quang, TP. Thái Nguyên",
+    "cover": "/images/san-thuc-te/6-4993f7fcd672.jpg",
+    "source": "https://media.sportnet.vn/venue/2166/banner-san-pickleball-an-happy-1761123628.jpeg",
+    "imageUrl": "https://media.sportnet.vn/venue/2166/banner-san-pickleball-an-happy-1761123628.jpeg"
+  },
+  {
+    "id": 7,
+    "name": "Sân Pickleball TNS",
+    "address": "101 Ngõ 802 Cách Mạng Tháng Tám, Phường Gia Sàng, TP. Thái Nguyên",
+    "cover": "/images/san-thuc-te/7-1fe65c53db9e.jpg",
+    "source": "https://media.sportnet.vn/venue/1429/san-pickleball-tns-4-1757320558.jpeg",
+    "imageUrl": "https://media.sportnet.vn/venue/1429/san-pickleball-tns-4-1757320558.jpeg"
+  },
+  {
+    "id": 8,
+    "name": "V32 Pickleball Club",
+    "address": "Số 32 Đường Thanh niên Xung phong, Phường Gia Sàng, TP. Thái Nguyên",
+    "cover": "/images/san-thuc-te/8-c3e85b41902e.jpg",
+    "source": "https://traketqua.bvdktuthainguyen.gov.vn/article/soi-noi-giai-pickleball-chao-mung-75-nam-thanh-lap-benh-vien-trung-uong-thai-nguyen",
+    "imageUrl": "https://bvdktuthainguyen.gov.vn/uploads/media/anh%20hoat%20dong/H%E1%BB%99i%20thao%202026/32.JPG"
+  },
+  {
+    "id": 9,
+    "name": "QT Pickleball & Beer",
+    "address": "Số 44 Đường Việt Bắc, Phường Đồng Quang, TP. Thái Nguyên",
+    "cover": "/images/san-thuc-te/9-d3c066a01480.jpg",
+    "source": "https://media.sportnet.vn/venue/2175/san-pickleball-qt-6-1761188673.jpeg",
+    "imageUrl": "https://media.sportnet.vn/venue/2175/san-pickleball-qt-6-1761188673.jpeg"
+  },
+  {
+    "id": 10,
+    "name": "Sân Pickleball Mái Che HXR",
+    "address": "HRJW+JMV, Khu đô thị Hồ Xương Rồng, Phường Phan Đình Phùng, TP. Thái Nguyên",
+    "cover": null,
+    "source": null,
+    "note": "CSV chỉ có thẻ giới thiệu Lool.vn."
+  },
+  {
+    "id": 11,
+    "name": "Pickleball Bắc Sơn Club",
+    "address": "Số 1 Ngõ 100 Hoàng Văn Thụ, Phường Hoàng Văn Thụ, TP. Thái Nguyên",
+    "cover": null,
+    "source": null,
+    "note": "CSV có ảnh phối cảnh và ảnh trùng nguồn với H83. Trang Sportnet ghi địa chỉ Lô 3 đường Bắc Sơn, khác địa chỉ trong CSV."
+  },
+  {
+    "id": 12,
+    "name": "PICKLEBALL XUÂN HOÀ",
+    "address": "Số 60 Đường Xuân Hòa, Phường Phan Đình Phùng, TP. Thái Nguyên",
+    "cover": "/images/san-thuc-te/12-7512d1732f24.jpg",
+    "source": "https://media.sportnet.vn/venue/1432/banner-san-pickleball-xuan-hoa-1757321440.jpeg",
+    "imageUrl": "https://media.sportnet.vn/venue/1432/banner-san-pickleball-xuan-hoa-1757321440.jpeg"
+  },
+  {
+    "id": 13,
+    "name": "Arena Pickleball Club Thái Nguyên",
+    "address": "HR95+2XW, Khu dân cư số 6, Phường Thịnh Đán, TP. Thái Nguyên",
+    "cover": null,
+    "source": null,
+    "note": "CSV chỉ có logo và thẻ giới thiệu."
+  },
+  {
+    "id": 14,
+    "name": "Eco Garden Pickleball",
+    "address": "HRHG+27M, Đường Bắc Sơn kéo dài, Phường Tân Thịnh, TP. Thái Nguyên",
+    "cover": "/images/san-thuc-te/14-569797b3ab2a.jpg",
+    "source": "https://media.sportnet.vn/venue/1428/banner-san-pickleball-eco-garden-1757320372.jpeg",
+    "imageUrl": "https://media.sportnet.vn/venue/1428/banner-san-pickleball-eco-garden-1757320372.jpeg"
+  },
+  {
+    "id": 15,
+    "name": "Hùng Anh Pickleball",
+    "address": "Số 43 Đường Lương Ngọc Quyến, Phường Phan Đình Phùng, TP. Thái Nguyên",
+    "cover": null,
+    "source": null,
+    "note": "Nguồn cùng tên ghi địa chỉ Sông Công, khác địa chỉ trên đường Lương Ngọc Quyến trong CSV."
+  },
+  {
+    "id": 16,
+    "name": "Hồ Bắc Pickleball",
+    "address": "Đường Việt Bắc, Phường Đồng Quang, TP. Thái Nguyên",
+    "cover": "/images/san-thuc-te/16-94259442458a.jpg",
+    "source": "https://media.sportnet.vn/venue/2170/san-pickleball-ho-bac--4-1761127388.jpeg",
+    "imageUrl": "https://media.sportnet.vn/venue/2170/san-pickleball-ho-bac--4-1761127388.jpeg"
+  },
+  {
+    "id": 17,
+    "name": "Cụm 5 Sân Thanh Long Pickleball",
+    "address": "Số 11 Ngõ 226 Đường 3/2, Phường Tích Lương, TP. Thái Nguyên",
+    "cover": "/images/san-thuc-te/17-45f01a2e869b.webp",
+    "source": "https://snxztjsluhdibrklougo.supabase.co/storage/v1/object/public/court-photos/tv2/2961.webp",
+    "imageUrl": "https://snxztjsluhdibrklougo.supabase.co/storage/v1/object/public/court-photos/tv2/2961.webp"
+  },
+  {
+    "id": 18,
+    "name": "PickleBall Hoàng Anh",
+    "address": "Số 112 Đường Hoàng Ngân, Phường Phan Đình Phùng, TP. Thái Nguyên",
+    "cover": null,
+    "source": null,
+    "note": "Ảnh banner trong CSV ghi Nam Định. Không dùng ảnh cùng album cho sân Thái Nguyên."
+  },
+  {
+    "id": 19,
+    "name": "H83 Pickleball",
+    "address": "HRWH+57R, Ngõ 100 Phù Liễn, Phường Hoàng Văn Thụ, TP. Thái Nguyên",
+    "cover": null,
+    "source": null,
+    "note": "Ảnh mang tên H83 Bắc Sơn, trong khi dòng CSV ghim sân H83 ở ngõ 100 Phù Liễn. Hai ảnh khác trùng với dòng Bắc Sơn Club."
+  },
+  {
+    "id": 20,
+    "name": "Pickle Pit Thái Nguyên",
+    "address": "Số 176 Đường Phù Liễn, Phường Hoàng Văn Thụ, TP. Thái Nguyên",
+    "cover": "/images/san-thuc-te/20-15899718040f.jpg",
+    "source": "https://media.sportnet.vn/venue/1497/san-the-pickle-pit-2-1757490524.jpeg",
+    "imageUrl": "https://media.sportnet.vn/venue/1497/san-the-pickle-pit-2-1757490524.jpeg"
+  },
+  {
+    "id": 21,
+    "name": "1985 Pickleball Club",
+    "address": "Số 1 Đường Cách Mạng Tháng 8, Phường Phan Đình Phùng, TP. Thái Nguyên",
+    "cover": "/images/san-thuc-te/21-afc24f207219.jpg",
+    "source": "https://sportnet.vn/venues/san-pickleball-1985",
+    "imageUrl": "https://media.sportnet.vn/venue/2171/banner-san-pickleball-1985-1761127493.jpeg"
+  },
+  {
+    "id": 22,
+    "name": "Kiên Sơn Pickleball Club",
+    "address": "Khu đô thị Picenza, Phường Đồng Bẩm, TP. Thái Nguyên",
+    "cover": null,
+    "source": null,
+    "note": "Thẻ Lool.vn ghi Quang Sơn, khác địa điểm Picenza trong CSV."
+  },
+  {
+    "id": 23,
+    "name": "Sân Pickleball Quang Minh",
+    "address": "Tổ 6, Phường Hoàng Văn Thụ, TP. Thái Nguyên (Cạnh sân bóng đá Quang Minh)",
+    "cover": "/images/san-thuc-te/23-5a9ff871c77c.jpg",
+    "source": "https://sportnet.vn/venues/san-pickleball-quang-minh-",
+    "imageUrl": "https://media.sportnet.vn/venue/1977/banner-san-pickleball-quang-minh--1759376002.jpeg"
+  },
+  {
+    "id": 24,
+    "name": "Sân Pickleball Thái Hưng",
+    "address": "Đường Thanh niên Xung phong, Phường Gia Sàng, TP. Thái Nguyên",
+    "cover": "/images/san-thuc-te/24-e063dddb0024.webp",
+    "source": "https://snxztjsluhdibrklougo.supabase.co/storage/v1/object/public/court-photos/tv2/2963.webp",
+    "imageUrl": "https://snxztjsluhdibrklougo.supabase.co/storage/v1/object/public/court-photos/tv2/2963.webp"
+  },
+  {
+    "id": 25,
+    "name": "Sân Pickleball Hoàng Gia",
+    "address": "Đường Z115, Phường Tân Thịnh, TP. Thái Nguyên",
+    "cover": null,
+    "source": null,
+    "note": "Ảnh Sportnet cùng tên thuộc sân ở Thanh Hóa. Ảnh phụ từ Pickdee chưa có thông tin để đối chiếu địa chỉ."
+  }
+]
