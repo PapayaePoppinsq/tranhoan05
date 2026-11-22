@@ -32,6 +32,12 @@ Sau khi build, `npm.cmd start` phục vụ cả giao diện lẫn API tại [htt
 
 `package-lock.json` khóa phiên bản của cả hai phần. SQLite tạo file khi chạy lần đầu trong `backend/var`. Giữ thư mục đó khi cần lưu tài khoản và đơn. Hai chế độ dùng file dữ liệu riêng theo mặc định.
 
+## Triển khai giao diện trên Cloudflare Pages
+
+Kết nối GitHub với **Pages** và chọn repo này, nhánh `main`. Để thư mục gốc trống, đặt build command `npm run build`, build output directory `frontend/dist`, và build variable `NODE_VERSION=24.13.0`. Lệnh build tạo `catalog.json` từ CSV và dữ liệu ảnh trước khi Vite đóng gói giao diện.
+
+Khi chưa có API, Pages hiển thị danh bạ tĩnh gồm 25 sân, ảnh đã đối chiếu, bản đồ và khoảng cách đường chim bay từ vị trí khách. Đây chỉ là thông tin tham khảo. Đăng nhập, lưu sân, lịch trống, chatbot và đặt sân cần backend Express chạy trên máy chủ riêng có ổ đĩa bền vững cho SQLite, cùng cấu hình chuyển tiếp `/api` đến máy chủ đó. Proxy trong `frontend/vite.config.js` chỉ chạy khi phát triển trên máy, không đi theo bản build Pages.
+
 ## Cấu hình dịch vụ ngoài
 
 ```powershell

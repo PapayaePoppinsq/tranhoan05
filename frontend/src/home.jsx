@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CalendarDays, Clock3, Crosshair, LayoutGrid, Map, MapPin, Search, SlidersHorizontal, Zap } from 'lucide-react';
-import { api, sameText, today, useApi } from './api';
+import { api, sameText, today, useApi, useCatalog } from './api';
 import { Alert, CourtCard, Empty, Loading } from './ui';
 import { CourtMap } from './map';
 import { useSite } from './state';
@@ -14,21 +14,34 @@ export function Home() {
   const [distanceError, setDistanceError] = useState('');
   const [availability, setAvailability] = useState(false), [revision, reload] = useState(0);
   const all = useApi('/venues', revision);
+  const catalog = useCatalog(Boolean(all.error));
+  const catalogOnly = Boolean(all.error && catalog.value);
   const filteredDay = availability || filter.date || filter.after;
-  const available = useApi(filteredDay ? `/venues?${new URLSearchParams({ date:filter.date || today(),
+  const available = useApi(filteredDay && !all.error ? `/venues?${new URLSearchParams({ date:filter.date || today(),
     available:'1', ...(filter.after ? {after:filter.after} : {}) })}` : null, revision);
-  const areas = [...new Set((all.value ?? []).map((venue) => venue.area).filter(Boolean))];
-  const source = filteredDay ? available : all;
+  const areas = [...new Set((all.value ?? catalog.value ?? []).map((venue) => venue.area).filter(Boolean))];
+  const source = all.error ? catalog : filteredDay ? available : all;
   useEffect(() => {
     setDistance({});
     setDistanceError('');
     if (!site.origin) return;
+    if (catalogOnly) {
+      const rows = catalog.value.map((venue) => {
+        const dLat = (venue.lat - site.origin.lat) * Math.PI / 180;
+        const dLng = (venue.lng - site.origin.lng) * Math.PI / 180;
+        const a = Math.sin(dLat / 2) ** 2 + Math.cos(site.origin.lat * Math.PI / 180) *
+          Math.cos(venue.lat * Math.PI / 180) * Math.sin(dLng / 2) ** 2;
+        return [venue.id, { km: 12742 * Math.asin(Math.sqrt(a)), type: 'straight' }];
+      });
+      setDistance(Object.fromEntries(rows));
+      return;
+    }
     const controller = new AbortController();
     api('/distances', { body:site.origin, signal:controller.signal }).then((rows) => {
       if (!controller.signal.aborted) setDistance(Object.fromEntries(rows.map((row) => [row.venueId,row])));
     }, (error) => { if (!controller.signal.aborted) setDistanceError(error.message); });
     return () => controller.abort();
-  }, [site.origin, revision]);
+  }, [site.origin, revision, catalogOnly, catalog.value]);
 
   const venues = useMemo(() => (source.value ?? []).filter((venue) => {
     if (group === 'featured' && !venue.featured) return false;
@@ -83,6 +96,8 @@ export function Home() {
       }}><option value="default">Ưu tiên sân đã lưu</option><option value="near">Gần nhất</option><option value="price">Giá thấp nhất</option></select>
         <div className="view-toggle"><button aria-label="Danh sách" aria-pressed={view === 'list'} onClick={() => setView('list')}><LayoutGrid size={17}/></button>
           <button aria-label="Bản đồ" aria-pressed={view === 'map'} onClick={() => setView('map')}><Map size={17}/></button></div></div></div>
+      {catalogOnly && <div className="info-box" role="status"><strong>Đang hiển thị danh bạ sân</strong>
+        <p>Trang này chưa kết nối backend nên chưa có lịch trống, đăng nhập hoặc đặt sân trực tuyến. Khoảng cách hiển thị là đường chim bay; mở từng sân để xem bản đồ và số liên hệ.</p></div>}
       <p className="demo-caption">Thông tin sân và đánh giá lấy từ CSV.{site.config?.demo ? ' Giá và lịch đặt của sân chưa xác minh dùng để chạy thử.' : ''}</p>
       {distanceError && <p className="info-box" role="status">Chưa tính được khoảng cách. {distanceError} <button className="text-button" onClick={() => reload((n) => n + 1)}>Thử lại</button></p>}
       {source.error ? <><Alert>{source.error}</Alert><button className="button secondary" onClick={() => reload((n) => n + 1)}>Thử lại</button></> :
@@ -90,7 +105,8 @@ export function Home() {
         view === 'map' ? <><CourtMap venues={venues} origin={site.origin}/>{venues.some((v) => v.lat == null || v.lng == null) &&
           <p className="muted">Một số sân chưa có tọa độ. Bạn vẫn có thể xem chúng ở danh sách.</p>}</> :
         <div className="court-grid">{venues.map((venue) => <CourtCard key={venue.id} venue={venue} distance={distance[venue.id]} demo={site.config?.demo}
-          date={filter.date || (filter.after ? today() : '')} after={filter.after} saved={site.favorites.includes(venue.id)} onSave={site.saveVenue}/>)}</div>}
+          date={filter.date || (filter.after ? today() : '')} after={filter.after} saved={site.favorites.includes(venue.id)}
+          onSave={catalogOnly ? () => site.setNotice('Cần kết nối backend để lưu sân vào tài khoản.') : site.saveVenue}/>)}</div>}
     </section></div>
   </>;
 }

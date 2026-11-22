@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, CalendarDays, CheckCircle2, Clock3, CreditCard, Heart, MapPin, Phone, ShieldCheck, TimerReset } from 'lucide-react';
-import { api, bookingStatus, detailsUrl, isBookingDate, longDate, money, reviewUrl, today, useApi } from './api';
+import { api, bookingStatus, detailsUrl, isBookingDate, longDate, money, reviewUrl, today, useApi, useCatalog } from './api';
 import { Alert, DateStrip, Empty, Loading, RouteLink, VenuePicture, VenueRating } from './ui';
 import { CourtMap } from './map';
 import { useSite } from './state';
@@ -23,8 +23,10 @@ function DetailPage({ id }) {
   const [prefill, setPrefill] = useState(null), [touched, setTouched] = useState(false);
   const [reload, bump] = useState(0), [routeError, setRouteError] = useState('');
   const detail = useApi(`/venues/${id}`);
-  const venue = detail.value;
-  const slotData = useApi(venue ? `/venues/${id}/availability?${new URLSearchParams({date,duration})}` : null, reload);
+  const catalog = useCatalog(Boolean(detail.error));
+  const venue = detail.value || catalog.value?.find((item) => String(item.id) === id);
+  const catalogOnly = Boolean(!detail.value && venue);
+  const slotData = useApi(venue && !catalogOnly ? `/venues/${id}/availability?${new URLSearchParams({date,duration})}` : null, reload);
   const targetTime = params.get('time');
   const requestedSlot = params.has('court') && targetTime;
   const proposed = !touched && prefill?.date === date && prefill.duration === duration ? prefill : null;
@@ -33,16 +35,16 @@ function DetailPage({ id }) {
   const current = court?.slots.find((slot) => slot.time === (selected || initialTime || proposed?.time) && slot.status === 'available');
   const mapVenues = useMemo(() => venue ? [venue] : [], [venue]);
   useEffect(() => {
-    if (!venue || touched || site.sessionLoading || requestedSlot) return;
+    if (!venue || catalogOnly || touched || site.sessionLoading || requestedSlot) return;
     const controller = new AbortController();
     api('/quick', { signal:controller.signal, body:{ venueId:venue.id,date,duration,
       after:targetTime || undefined,origin:site.origin || undefined } }).then(({results}) => {
       if (!controller.signal.aborted) setPrefill(results[0] || null);
     }, () => {});
     return () => controller.abort();
-  }, [venue, date, duration, targetTime, requestedSlot, site.origin, site.sessionLoading, touched]);
+  }, [venue, catalogOnly, date, duration, targetTime, requestedSlot, site.origin, site.sessionLoading, touched]);
   useEffect(() => {
-    if (!site.origin || !venue || !showMap) { setRoute(null); setRouteError(''); return; }
+    if (!site.origin || !venue || !showMap || catalogOnly) { setRoute(null); setRouteError(''); return; }
     const controller = new AbortController();
     setRoute(null); setRouteError('');
     api(`/venues/${id}/route`, {body:site.origin,signal:controller.signal}).then((result) => {
@@ -52,9 +54,10 @@ function DetailPage({ id }) {
       }
     }, (error) => { if (!controller.signal.aborted) setRouteError(error.message); });
     return () => controller.abort();
-  }, [venue, site.origin, id, showMap]);
+  }, [venue, catalogOnly, site.origin, id, showMap]);
   if (detail.loading) return <div className="shell page"><Loading/></div>;
-  if (detail.error) return <div className="shell page"><Alert>{detail.error}</Alert><Link to="/">Về danh sách sân</Link></div>;
+  if (detail.error && catalog.loading) return <div className="shell page"><Loading/></div>;
+  if (detail.error && !venue) return <div className="shell page"><Alert>{catalog.error || detail.error}</Alert><Link to="/">Về danh sách sân</Link></div>;
   if (!venue) return null;
   const saved = site.favorites.includes(venue.id);
   const canBook = Boolean(venue.courts.length && (venue.verified || site.config?.demo));
@@ -67,7 +70,7 @@ function DetailPage({ id }) {
   return <div className="shell page detail"><Link className="back" to="/"><ArrowLeft size={17}/> Danh sách sân</Link>
     <div className="detail-hero"><VenuePicture venue={venue}/><div className="detail-title"><p><MapPin size={16}/> {venue.area}</p>
       <h1>{venue.name}</h1><p>{venue.address}</p></div><button className={`save-button ${saved ? 'saved' : ''}`} aria-pressed={saved}
-      aria-label={saved ? 'Bỏ lưu sân' : 'Lưu sân'} onClick={() => site.saveVenue(venue.id)}><Heart size={20}/></button>
+      aria-label={saved ? 'Bỏ lưu sân' : 'Lưu sân'} onClick={() => catalogOnly ? site.setNotice('Cần kết nối backend để lưu sân vào tài khoản.') : site.saveVenue(venue.id)}><Heart size={20}/></button>
       {venue.image && venue.image_sample ? <span className="photo-caption">Ảnh minh họa</span> : null}</div>
     {venue.photo_source && <a className="photo-source" href={venue.photo_source} target="_blank" rel="noreferrer">Nguồn ảnh</a>}
     <div className="detail-facts"><span><Clock3 size={17}/> {venue.open === '00:00' && venue.close === '24:00' ? 'Mở 24 giờ' : `${venue.open}–${venue.close}`}</span>
@@ -77,7 +80,9 @@ function DetailPage({ id }) {
       <span>{venue.verified ? `${money(venue.price)}/giờ` : site.config?.demo ? `Giá thử ${money(venue.price)}/giờ` : 'Chưa có giá xác minh'}</span>
       <button className="text-button" onClick={() => setShowMap(!showMap)} aria-expanded={showMap}>
         <MapPin size={17}/>{showMap ? 'Ẩn bản đồ' : 'Xem bản đồ'}</button></div>
-    {!venue.verified ? <div className="info-box"><strong>Sân đang chờ xác minh</strong>
+    {catalogOnly && <div className="info-box" role="status"><strong>Danh bạ tham khảo</strong>
+      <p>Trang chưa kết nối backend. Chưa thể xem lịch trống hoặc đặt sân trực tuyến; hãy liên hệ sân để kiểm tra giờ và giá.</p></div>}
+    {!venue.verified && !catalogOnly ? <div className="info-box"><strong>Sân đang chờ xác minh</strong>
       <p>{site.config?.demo ? 'Lịch đặt và giá dùng để chạy thử. Hãy gọi sân để xác nhận giờ và giá thật.' : 'Địa điểm này chưa mở đặt trực tuyến.'}
         {venue.map_url && <a href={venue.map_url} target="_blank" rel="noreferrer"> Xem sân trên Google Maps</a>}</p></div> : null}
     {showMap && <section className="panel map-panel"><h2>Vị trí cụm sân</h2>
