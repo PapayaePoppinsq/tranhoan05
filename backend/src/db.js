@@ -56,11 +56,9 @@ WHEN (NEW.status = 'confirmed' OR (NEW.status = 'pending' AND NEW.hold_until > u
 BEGIN SELECT RAISE(ABORT, 'slot_conflict'); END;
 `;
 
-export function createDatabase(filename) {
-  if (filename !== ':memory:') mkdirSync(dirname(filename), { recursive: true });
-  const db = new DatabaseSync(filename);
-  db.exec('PRAGMA foreign_keys = ON; PRAGMA journal_mode = WAL; PRAGMA busy_timeout = 4000;');
-  db.exec(ddl + conflictTrigger('insert') + conflictTrigger('update'));
+export const schemaSql = ddl + conflictTrigger('insert') + conflictTrigger('update');
+
+export function upgradeSchema(db) {
   transaction(db, () => {
     const columns = new Set(db.prepare('PRAGMA table_info(venues)').all().map(({ name }) => name));
     for (const [name, type] of Object.entries({ directory_id: 'INTEGER', category: 'TEXT', rating: 'REAL',
@@ -71,10 +69,19 @@ export function createDatabase(filename) {
       db.exec('ALTER TABLE courts ADD COLUMN is_demo INTEGER NOT NULL DEFAULT 0');
     }
   });
+}
+
+export function createDatabase(filename) {
+  if (filename !== ':memory:') mkdirSync(dirname(filename), { recursive: true });
+  const db = new DatabaseSync(filename);
+  db.exec('PRAGMA foreign_keys = ON; PRAGMA journal_mode = WAL; PRAGMA busy_timeout = 4000;');
+  db.exec(schemaSql);
+  upgradeSchema(db);
   return db;
 }
 
 export function transaction(db, work) {
+  if (db.transactionSync) return db.transactionSync(work);
   db.exec('BEGIN IMMEDIATE');
   try {
     const result = work();

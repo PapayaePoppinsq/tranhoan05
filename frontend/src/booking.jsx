@@ -60,7 +60,8 @@ function DetailPage({ id }) {
   if (detail.error && !venue) return <div className="shell page"><Alert>{catalog.error || detail.error}</Alert><Link to="/">Về danh sách sân</Link></div>;
   if (!venue) return null;
   const saved = site.favorites.includes(venue.id);
-  const canBook = Boolean(venue.courts.length && (venue.verified || site.config?.demo));
+  const canBook = Boolean(venue.courts.length && (site.config?.demo ||
+    (venue.verified && site.config?.payment === 'payos')));
   function chooseDate(day) {
     if (!isBookingDate(day)) return;
     setTouched(true);
@@ -102,7 +103,8 @@ function DetailPage({ id }) {
         <label>Thời lượng<select value={duration} onChange={(e) => {setTouched(true);setDuration(Number(e.target.value));setSelected(null);}}>
           {[30,60,90,120,150,180].map((d) => <option key={d} value={d}>{d} phút</option>)}</select></label></div>}
       <Alert>{slotData.error}</Alert>{slotData.error && <button className="button secondary" onClick={() => bump((n) => n + 1)}>Tải lại lịch</button>}
-      {slotData.loading ? <Loading>Đang kiểm tra giờ trống…</Loading> : court ? <>
+      {site.config?.payment === 'off' && <p className="muted">Đặt sân trực tuyến sẽ mở khi quản trị viên cấu hình thanh toán.</p>}
+      {slotData.loading ? <Loading>Đang kiểm tra giờ trống…</Loading> : canBook && court ? <>
         <div className="slot-legend"><span><b/> Còn trống</span><span className="booked"><b/> Đã đặt</span><span className="held"><b/> Đang giữ</span></div>
         {!court.slots.length && <p className="muted">Thời lượng này vượt quá giờ hoạt động.</p>}
         <div className="slots">{court.slots.map((slot) => <button type="button" key={slot.time}

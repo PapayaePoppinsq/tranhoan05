@@ -36,7 +36,18 @@ Sau khi build, `npm.cmd start` phục vụ cả giao diện lẫn API tại [htt
 
 Kết nối GitHub với **Pages** và chọn repo này, nhánh `main`. Để thư mục gốc trống, đặt build command `npm run build`, build output directory `frontend/dist`, và build variable `NODE_VERSION=24.13.0`. Lệnh build tạo `catalog.json` từ CSV và dữ liệu ảnh trước khi Vite đóng gói giao diện.
 
-Khi chưa có API, Pages hiển thị danh bạ tĩnh gồm 25 sân, ảnh đã đối chiếu, bản đồ và khoảng cách đường chim bay từ vị trí khách. Đây chỉ là thông tin tham khảo. Đăng nhập, lưu sân, lịch trống, chatbot và đặt sân cần backend Express chạy trên máy chủ riêng có ổ đĩa bền vững cho SQLite, cùng cấu hình chuyển tiếp `/api` đến máy chủ đó. Proxy trong `frontend/vite.config.js` chỉ chạy khi phát triển trên máy, không đi theo bản build Pages.
+Khi chưa có API, Pages hiển thị danh bạ tĩnh gồm 25 sân, ảnh đã đối chiếu, bản đồ và khoảng cách đường chim bay từ vị trí khách. Đây chỉ là thông tin tham khảo. Đăng nhập, lưu sân, lịch trống, chatbot và đặt sân cần backend cùng kho dữ liệu bền vững. Proxy trong `frontend/vite.config.js` chỉ chạy khi phát triển trên máy, không đi theo bản build Pages.
+
+### Backend Cloudflare Worker
+
+Thư mục `worker/` đóng gói API Express trong một Worker và dùng một Durable Object SQLite để lưu tài khoản, sân, lịch và đơn. Dữ liệu được giữ trên Cloudflare thay vì file SQLite tạm của Worker. Thư mục `functions/` chuyển các yêu cầu `/api/*` và ảnh quản trị từ Pages sang Worker cùng nguồn gốc trình duyệt; cookie đăng nhập tiếp tục thuộc miền Pages.
+
+1. Đăng nhập Wrangler vào **cùng tài khoản Cloudflare chứa dự án Pages**. Kiểm tra bằng `wrangler whoami` và `wrangler pages project list`.
+2. Chạy `npm ci`, `npm run build`, rồi `wrangler deploy --config worker/wrangler.jsonc`. Kiểm tra `https://<worker>.workers.dev/api/health` trả `{"ok":true}`.
+3. Trong dự án Pages `tranhoan05`, đặt biến môi trường production `BACKEND_ORIGIN` bằng gốc HTTPS của Worker, không có `/api` ở cuối. Redeploy Pages từ nhánh `main` để hàm proxy đọc biến mới.
+4. Đặt secret `ADMIN_PASSWORD` riêng cho Worker bằng `wrangler secret put ADMIN_PASSWORD --config worker/wrangler.jsonc`, rồi triển khai lại. Không ghi mật khẩu vào Git. Số đăng nhập quản trị là `0900000000`.
+
+Các sân từ CSV chưa có bảng giá và sân nhỏ đã xác minh. Quản trị viên cần nhập thông tin thật trước khi mở đặt. Khi chưa có đủ khóa payOS, API trả `payment: "off"` và giao diện không cho chốt đơn; chỉ bật thanh toán sau khi kiểm tra tài khoản nhận tiền, webhook và thông tin sân. `PUBLIC_ORIGIN` trong `worker/wrangler.jsonc` phải trùng chính xác miền Pages đang dùng.
 
 ## Cấu hình dịch vụ ngoài
 

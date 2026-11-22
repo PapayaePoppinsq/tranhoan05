@@ -1,5 +1,5 @@
 import express from 'express';
-import { rateLimit } from 'express-rate-limit';
+import { rateLimit, ipKeyGenerator } from 'express-rate-limit';
 import { z } from 'zod';
 import { randomUUID } from 'node:crypto';
 import { existsSync } from 'node:fs';
@@ -81,10 +81,12 @@ function uploadImage(db, value) {
   return `/api/media/${id}`;
 }
 
-export async function createApp(config) {
-  const db = createDatabase(config.database);
-  syncDirectory(db);
-  syncDirectoryPhotos(db);
+export async function createApp(config, database) {
+  const db = database || createDatabase(config.database);
+  if (!database) {
+    syncDirectory(db);
+    syncDirectoryPhotos(db);
+  }
   await seedAdmin(db, config);
   const payments = createPayments(db, config);
   const app = express();
@@ -94,6 +96,7 @@ export async function createApp(config) {
   const protect = protectRequests(config);
   const json = (size) => express.json({ limit: size, inflate: false });
   const limit = (n, ms) => rateLimit({ limit: n, windowMs: ms, standardHeaders: 'draft-8', legacyHeaders: false,
+    keyGenerator: (req) => ipKeyGenerator(req.get('CF-Connecting-IP') || req.ip || '127.0.0.1'),
     message: { error: 'Quá nhiều yêu cầu. Hãy thử lại sau.' } });
   const authLimit = limit(18, 600000);
   const searchLimit = limit(35, 60000);
@@ -311,8 +314,8 @@ export async function createApp(config) {
     res.status(201).json({ image: uploadImage(db, req.body?.image) });
   });
   router.use((_req,_res,next) => next(new HttpError(404,'Không tìm thấy API.')));
-  const dist = path('../../frontend/dist');
-  if (existsSync(`${dist}/index.html`)) {
+  const dist = database ? null : path('../../frontend/dist');
+  if (dist && existsSync(`${dist}/index.html`)) {
     app.use(express.static(dist));
     app.get('/{*route}', (req, res, next) => {
       if (!req.accepts('html') || /\.[^/]+$/.test(req.path)) return next(new HttpError(404, 'Không tìm thấy tệp.'));
@@ -329,7 +332,7 @@ export async function createApp(config) {
   return { app, db };
 }
 
-if (process.argv[1]?.toLowerCase() === fileURLToPath(import.meta.url).toLowerCase()) {
+if (import.meta.url && process.argv[1]?.toLowerCase() === fileURLToPath(import.meta.url).toLowerCase()) {
   const config = configuration();
   const { app } = await createApp(config);
   app.listen(config.port, '127.0.0.1', () => console.log(`Sân Vợt API: http://localhost:${config.port}`));
