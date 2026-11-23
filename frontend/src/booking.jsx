@@ -127,8 +127,15 @@ function DetailPage({ id }) {
         <label>Thời lượng<select value={duration} onChange={(e) => {setTouched(true);setDuration(Number(e.target.value));setSelected(null);}}>
           {[30,60,90,120,150,180].map((d) => <option key={d} value={d}>{d} phút</option>)}</select></label></div>}
       <Alert>{slotData.error}</Alert>{slotData.error && <button className="button secondary" onClick={() => bump((n) => n + 1)}>Tải lại lịch</button>}
-      {site.config?.payment === 'off' && <p className="muted">Đặt sân trực tuyến sẽ mở khi quản trị viên cấu hình thanh toán.</p>}
-      {slotData.loading ? <Loading>Đang kiểm tra giờ trống…</Loading> : canBook && court ? <>
+      {!canBook && venue.courts.length > 0 && <div className="listed-courts">
+        <h3>{venue.courts.length} sân nhỏ đã thêm</h3>
+        <ul>{venue.courts.map((item) => <li key={item.id}>{item.name}</li>)}</ul>
+        <p className="muted">Các sân này chưa hiển thị lịch trống để đặt trực tuyến.
+          {!venue.verified && ' Quản trị viên cần xác minh cụm sân và giá.'}
+          {site.config?.payment === 'off' && ' Hệ thống cần cấu hình thanh toán.'}</p>
+      </div>}
+      {!canBook && !venue.courts.length && <p className="muted">Chưa có sân nhỏ nào đang hoạt động để đặt.</p>}
+      {slotData.loading && canBook ? <Loading>Đang kiểm tra giờ trống…</Loading> : canBook && court ? <>
         <div className="slot-legend"><span><b/> Còn trống</span><span className="booked"><b/> Đã đặt</span><span className="held"><b/> Đang giữ</span></div>
         {!court.slots.length && <p className="muted">Thời lượng này vượt quá giờ hoạt động.</p>}
         <div className="slots">{court.slots.map((slot) => <button type="button" key={slot.time}
@@ -138,7 +145,7 @@ function DetailPage({ id }) {
             slot.status === 'past' ? 'Đã qua' : `đến ${slot.end}`}</small></button>)}</div>
         {targetTime && !touched && !current && court.slots.find((slot) => slot.time === targetTime && slot.status === 'available') &&
           <button className="text-button" onClick={() => {setTouched(true);setCourtId(court.id);setSelected(targetTime);}}>Chọn khung tìm kiếm {targetTime}</button>}
-      </> : !slotData.error && <p className="muted">Hiện chưa có sân nhỏ mở lịch đặt.</p>}
+      </> : canBook && !slotData.error && <p className="muted">Hiện chưa tải được lịch đặt cho sân nhỏ này.</p>}
     </section><aside className="panel summary"><h2>Đơn của bạn</h2><p className="muted">{venue.name}</p><dl className="summary-list">
       <div><dt>Ngày</dt><dd>{longDate(date)}</dd></div><div><dt>Sân nhỏ</dt><dd>{court?.name || 'Chưa chọn'}</dd></div>
       <div><dt>Giờ chơi</dt><dd>{current ? `${current.time}–${current.end}` : 'Chưa chọn'}</dd></div></dl>

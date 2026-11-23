@@ -95,7 +95,7 @@ export function Admin() {
       <button className={`chip ${tab === 'bookings' ? 'on' : ''}`} onClick={() => setTab('bookings')}>Đơn đặt sân</button></div></div>
     {tab === 'venues' ? <div className="admin-columns"><section className="panel admin-list"><h2>Danh sách cụm sân</h2>
       <Alert>{venues.error}</Alert>{venues.loading ? <Loading/> : list.map((venue) => <button className="admin-venue" key={venue.id} aria-pressed={venue.id === editing}
-        onClick={() => setEditing(venue.id)}><strong>{venue.name}</strong><span>{venue.area} · {venue.courts.length} sân · {venue.active ? (venue.verified ? 'Đã xác minh' : 'Tham khảo') : 'Đã ẩn'}</span></button>)}</section>
+        onClick={() => setEditing(venue.id)}><strong>{venue.name}</strong><span>{venue.area} · {venue.courts.filter((court) => court.active && !court.is_demo).length} sân hoạt động · {venue.active ? (venue.verified ? 'Đã xác minh' : 'Tham khảo') : 'Đã ẩn'}</span></button>)}</section>
       {editing === 'new' || selected ? <VenueEditor key={editing} venue={selected} admin={admin} onSaved={(id) => {
         setEditing(id);reload((n) => n + 1);
       }}/> : <section className="panel"><h2>Thông tin sân</h2><p className="muted">Chọn một cụm sân để sửa hoặc thêm cụm sân mới.</p></section>}</div> :
@@ -161,8 +161,10 @@ function VenueEditor({ venue, admin, onSaved }) {
       {venue && <label className="check"><input type="checkbox" checked={data.active} onChange={(e) => edit('active',e.target.checked)}/> Hiện cụm sân trên web</label>}
       <button className="button primary" disabled={busy}>{busy ? 'Đang lưu…' : 'Lưu cụm sân'}</button>
     </form>
-    {venue && <div className="admin-courts"><h3>Các sân nhỏ</h3>{venue.courts.map((court) => <div key={court.id}><span>{court.name} · {court.active ? 'Mở đặt' : 'Tạm khóa'}</span>
-      <button className="text-button" disabled={busy} onClick={(e) => updateCourt(e,court)}>{court.active ? 'Tạm khóa' : 'Mở lại'}</button></div>)}
+    {venue && <div className="admin-courts"><h3>Các sân nhỏ</h3>
+      <p className="muted">Sân đang hoạt động chỉ nhận đặt trực tuyến khi cụm sân được xác minh và thanh toán đã cấu hình.</p>
+      {venue.courts.map((court) => <div key={court.id}><span>{court.name} · {court.is_demo ? 'Sân mẫu, chỉ dùng chạy thử' : court.active ? 'Đang hoạt động' : 'Tạm khóa'}</span>
+      {!court.is_demo && <button className="text-button" disabled={busy} onClick={(e) => updateCourt(e,court)}>{court.active ? 'Tạm khóa' : 'Mở lại'}</button>}</div>)}
       <form className="inline-form" onSubmit={(e) => updateCourt(e)}><input required placeholder="Tên sân nhỏ" aria-label="Tên sân nhỏ" value={courtName}
         onChange={(e) => setCourtName(e.target.value)}/><button className="button secondary" disabled={busy}><Plus size={17}/> Thêm sân</button></form></div>}
   </section>;

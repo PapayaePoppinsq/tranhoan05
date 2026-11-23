@@ -292,7 +292,7 @@ export async function createApp(config, database) {
     const query = 'SELECT v.*, u.phone AS owner_phone FROM venues v LEFT JOIN users u ON u.id=v.owner_id';
     const venues = req.user.role === 'admin' ? db.prepare(`${query} ORDER BY v.id`).all() :
       db.prepare(`${query} WHERE v.owner_id=? ORDER BY v.id`).all(req.user.id);
-    res.json(venues.map((venue) => ({...venue, courts: db.prepare('SELECT id,name,active FROM courts WHERE venue_id=? ORDER BY id').all(venue.id)})));
+    res.json(venues.map((venue) => ({...venue, courts: db.prepare('SELECT id,name,active,is_demo FROM courts WHERE venue_id=? ORDER BY id').all(venue.id)})));
   });
   manage.post('/venues', (req, res) => {
     const v = venueSchema.parse(req.body);

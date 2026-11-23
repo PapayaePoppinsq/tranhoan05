@@ -44,3 +44,8 @@
 .venue-rating small{font-size:inherit;color:var(--muted)}
 .detail-facts a.text-button{margin-left:0}
 .photo-source{display:block;text-align:right;margin:6px 2px 0;color:var(--forest);font-size:.78rem;text-decoration:underline;text-underline-offset:2px}
+.listed-courts{margin:16px 0;padding:15px;border:1px solid var(--border);border-radius:12px;background:#f7faf6}
+.listed-courts h3{font-size:1rem;margin-bottom:10px}
+.listed-courts ul{display:flex;flex-wrap:wrap;gap:8px;list-style:none;margin:0 0 12px;padding:0}
+.listed-courts li{padding:6px 10px;border:1px solid #d5e3d0;border-radius:8px;background:white;font-size:.9rem}
+.listed-courts p{margin:0}
