@@ -153,7 +153,7 @@ export function distanceKm({ lat, lng }, venue) {
   return 6371 * 2 * Math.asin(Math.min(1, Math.sqrt(a)));
 }
 
-export function suggest(db, { date, after, before, duration = 60, area, maxPrice, origin, venueId }, user, demo) {
+export function suggest(db, { date, after, before, duration = 60, area, maxPrice, origin, venueId, venueIds }, user, demo) {
   if (!validDate(date)) throw new HttpError(400, 'Chọn ngày trong 30 ngày tới.');
   const saved = new Set(user ? db.prepare('SELECT venue_id FROM favorites WHERE user_id=?').all(user.id)
     .map(({ venue_id }) => venue_id) : []);
@@ -163,6 +163,7 @@ export function suggest(db, { date, after, before, duration = 60, area, maxPrice
   const results = [];
   for (const venue of listVenues(db)) {
     if (venueId && venue.id !== venueId) continue;
+    if (venueIds?.length && !venueIds.includes(venue.id)) continue;
     if ((!venue.verified && !demo) || (area && !textKey(`${venue.area} ${venue.name} ${venue.address}`).includes(textKey(area)))) continue;
     if (maxPrice != null && Math.round(venue.price * duration / 60) > maxPrice) continue;
     const km = origin && distanceKm(origin, venue);

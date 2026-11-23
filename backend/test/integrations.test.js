@@ -73,6 +73,15 @@ test('natural response falls back when model output is invalid', async () => {
   assert.deepEqual(result, { reply:'Chưa có sân mở nhận đặt.', mode:'fallback' });
 });
 
+test('a reply to a time change cannot misstate the checked hour', async () => {
+  const ai = { async run() { return { response:'Mình đổi sang 20:00 nhé, web chưa mở giữ chỗ.' }; } };
+  const result = await naturalReply({ ai }, { message:'Muộn hơn nửa tiếng nhé', history:[],
+    criteria:{ after:'19:30' }, facts:{ searchStatus:'paymentOff', changedAfter:'19:30', results:[] },
+    fallback:'Mình đổi sang từ 19:30 nhé. Web vẫn chưa mở giữ chỗ.' });
+  assert.equal(result.mode, 'fallback');
+  assert.match(result.reply, /19:30/);
+});
+
 test('natural response cannot ask for a date already known or promise unavailable courts', async () => {
   const ai = { async run() { return { response:'Ngày mai là ngày nào vậy? Cho mình ngày cụ thể nhé.' }; } };
   const result = await naturalReply({ ai }, { message:'Tối mai còn sân không?', history:[],

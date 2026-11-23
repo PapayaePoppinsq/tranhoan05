@@ -83,6 +83,38 @@ test('small talk and help do not trigger booking search, and a follow-up remembe
   assert.match(followUp.body.reply, /90\.000/);
 });
 
+test('Gemma can revise a search in context without discarding the original venue and date', async (t) => {
+  const ai = { async run(_model, {messages}) {
+    const message = messages.at(-1).content;
+    const planning = messages[0].content.startsWith('Đọc hội thoại');
+    if (!planning) return { response: 'Bạn xem các khung phù hợp bên dưới nhé.' };
+    if (message.startsWith('Tìm sân')) return { response: '{"intent":"booking","venueIds":[1]}' };
+    assert.ok(messages.some(({role,content}) => role === 'user' && content.startsWith('Tìm sân')));
+    assert.match(messages[0].content, /"after":"19:00"/);
+    return { response: '{"intent":"booking","after":"19:30","clear":["maxPrice"]}' };
+  } };
+  const made = await createApp({ demo:true, paymentMode:'demo', database:':memory:', origin:'http://localhost:5173', ai });
+  const app = made.app.listen(0, '127.0.0.1');
+  await once(app, 'listening');
+  t.after(async () => { await new Promise((resolve) => app.close(resolve)); made.db.close(); });
+  const chat = async (body) => {
+    const response = await fetch(`http://127.0.0.1:${app.address().port}/api/chat`, {
+      method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify(body),
+    });
+    assert.equal(response.status, 200);
+    return response.json();
+  };
+  const message = 'Tìm sân Vin Pickleball Thanh Niên 2 tối mai sau 7 giờ, dưới 250 nghìn';
+  const first = await chat({ message });
+  assert.equal(first.criteria.maxPrice, 249999);
+  assert.equal(first.criteria.date, dateAt(1));
+  const followUp = await chat({ message:'Muộn hơn nửa tiếng nhé, giá nào cũng được.', context:first.criteria,
+    history:[{ role:'user', content:message }, { role:'assistant', content:first.reply }] });
+  assert.deepEqual(followUp.criteria, { date:dateAt(1), after:'19:30', venueIds:[1] });
+  assert.ok(followUp.results.length > 0);
+  assert.ok(followUp.results.every(({venueId,time}) => venueId === 1 && time >= '19:30'));
+});
+
 test('directory details backfill existing venues without changing their booking settings or favorites', () => {
   const existing = createDatabase(':memory:');
   try {
