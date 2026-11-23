@@ -259,7 +259,7 @@ test('quick booking learns from completed bookings and suggests several days', a
 
 test('quick endpoint uses Gemma without letting it create a booking option', async (t) => {
   const ai = { async run(_model, input) {
-    assert.match(input.messages[1].content,/ưu tiên tối thứ Bảy/);
+    assert.match(input.messages[1].content,/ưu tiên giờ buổi tối/);
     return { response:'{"order":[1,0,2]}' };
   } };
   const service = await createApp({ demo:true, paymentMode:'demo', database:':memory:',
@@ -268,7 +268,7 @@ test('quick endpoint uses Gemma without letting it create a booking option', asy
   await once(app,'listening');
   t.after(async () => { await new Promise((resolve) => app.close(resolve)); service.db.close(); });
   const response = await fetch(`http://127.0.0.1:${app.address().port}/api/quick`, { method:'POST',
-    headers:{ 'Content-Type':'application/json' }, body:JSON.stringify({ preference:'ưu tiên tối thứ Bảy' }) });
+    headers:{ 'Content-Type':'application/json' }, body:JSON.stringify({ preference:'ưu tiên giờ buổi tối' }) });
   assert.equal(response.status,200);
   const body = await response.json();
   assert.equal(body.mode,'ai');

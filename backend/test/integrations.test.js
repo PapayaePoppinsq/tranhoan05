@@ -20,6 +20,12 @@ test('Gemma may reorder only checked quick-booking choices', async () => {
     recommendation);
   assert.equal(invalid.mode,'rules');
   assert.deepEqual(invalid.results.map(({venueId}) => venueId),[1,2,3]);
+  const weekendChoices = { ...recommendation, results:recommendation.results.map((row, index) =>
+    index === 3 ? { ...row, date:'2026-11-28' } : row) };
+  const missedWeekend = await rankQuickWithAI({ ai:{ async run() { return { response:'{"order":[0,1,2]}' }; } } },
+    weekendChoices, 'ưu tiên tối cuối tuần');
+  assert.equal(missedWeekend.mode,'rules');
+  assert.equal(missedWeekend.results[0].date,'2026-11-28');
 });
 
 test('Workers AI extracts Vietnamese search criteria without controlling booking data', async () => {
