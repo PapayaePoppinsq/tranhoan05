@@ -100,6 +100,7 @@ export async function createApp(config, database) {
     message: { error: 'Quá nhiều yêu cầu. Hãy thử lại sau.' } });
   const authLimit = limit(18, 600000);
   const searchLimit = limit(35, 60000);
+  const chatLimit = limit(12, 60000);
   const uploadLimit = limit(12, 60000);
   function loadUser(req, _res, next) {
     req.user = sessionUser(db, req);
@@ -123,7 +124,7 @@ export async function createApp(config, database) {
 
   router.get('/health', (_req, res) => res.json({ ok: true }));
   router.get('/config', (_req, res) => res.json({ demo: config.demo, payment: config.paymentMode,
-    chat: config.geminiKey && config.geminiModel ? 'ai' : 'demo' }));
+    chat: config.ai || config.geminiKey && config.geminiModel ? 'ai' : 'demo' }));
   router.get('/auth/me', (req, res) => res.json(userView(req.user)));
   router.post('/auth/register', authLimit, async (req, res) => {
     const { name, phone, email, password } = userSchema.extend({ password: z.string().min(8).max(128) }).parse(req.body);
@@ -205,10 +206,11 @@ export async function createApp(config, database) {
     if (!filters.date && !results.length) results = suggest(db, { ...filters, date: dateAt(1) }, req.user, config.demo);
     res.json({ results });
   });
-  router.post('/chat', searchLimit, async (req, res) => {
+  router.post('/chat', chatLimit, async (req, res) => {
     const { message, context, origin } = z.object({ message: z.string().trim().min(1).max(500),
       context: filterSchema.optional(), origin: originSchema.optional() }).parse(req.body);
-    const areas = [...new Set(listVenues(db).map((v) => v.area))];
+    const venues = listVenues(db);
+    const areas = [...new Set(venues.map((v) => v.area))];
     const { criteria, mode } = await interpret(config, message, areas);
     const combined = { ...context, ...criteria };
     const startingArea = combined.area || Boolean(origin);
@@ -223,7 +225,9 @@ export async function createApp(config, database) {
     else {
       results = suggest(db, { ...combined, origin }, req.user, config.demo);
       reply = results.length ? `Mình tìm được ${results.length} khung giờ phù hợp, mặc định ${combined.duration ?? 60} phút. Chọn một khung để xem lại đơn.` :
-        'Chưa có sân phù hợp với các điều kiện này. Thử chọn giờ, khu vực hoặc mức giá khác.';
+        !config.demo && venues.every((venue) => !venue.verified || !venue.court_count) ?
+          'Hiện chưa có sân nào được xác minh và mở nhận đặt. Bạn có thể xem thông tin các cụm sân ở trang tìm sân.' :
+          'Chưa có sân phù hợp với các điều kiện này. Thử chọn giờ, khu vực hoặc mức giá khác.';
     }
     res.json({ reply, results, criteria: combined, mode });
   });

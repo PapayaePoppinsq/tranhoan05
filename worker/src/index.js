@@ -42,7 +42,7 @@ export class BookingDatabase extends DurableObject {
       const config = { origin, secure:true, demo:false, port:4311, payos,
         paymentMode:Object.values(payos).every(Boolean) ? 'payos' : 'off',
         adminPassword:env.ADMIN_PASSWORD?.trim(), geminiKey:env.GEMINI_API_KEY,
-        geminiModel:env.GEMINI_MODEL, orsKey:env.ORS_API_KEY };
+        geminiModel:env.GEMINI_MODEL, ai:env.AI, orsKey:env.ORS_API_KEY };
       this.db = db;
       this.config = config;
       const { app } = await createApp(config, db);

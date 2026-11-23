@@ -6,6 +6,7 @@
   "vars": {
     "PUBLIC_ORIGIN": "https://tranhoan05.pages.dev"
   },
+  "ai": { "binding": "AI" },
   "durable_objects": {
     "bindings": [
       { "name": "BOOKING_DB", "class_name": "BookingDatabase" }

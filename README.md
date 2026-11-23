@@ -43,7 +43,7 @@ Khi chưa có API, Pages hiển thị danh bạ tĩnh gồm 25 sân, ảnh đã 
 Thư mục `worker/` đóng gói API Express trong một Worker và dùng một Durable Object SQLite để lưu tài khoản, sân, lịch và đơn. Dữ liệu được giữ trên Cloudflare thay vì file SQLite tạm của Worker. Thư mục `functions/` chuyển các yêu cầu `/api/*` và ảnh quản trị từ Pages sang Worker cùng nguồn gốc trình duyệt; cookie đăng nhập tiếp tục thuộc miền Pages.
 
 1. Đăng nhập Wrangler vào **cùng tài khoản Cloudflare chứa dự án Pages**. Kiểm tra bằng `wrangler whoami` và `wrangler pages project list`.
-2. Chạy `npm ci`, `npm run build`, rồi `wrangler deploy --config worker/wrangler.jsonc`. Kiểm tra `https://<worker>.workers.dev/api/health` trả `{"ok":true}`.
+2. Chạy `npm ci`, `npm run build`, rồi `wrangler deploy --config worker/wrangler.jsonc --durable-objects-code-update-mode immediate`. Kiểm tra `https://<worker>.workers.dev/api/health` trả `{"ok":true}`. Worker có binding Workers AI, dùng Gemma 4 26B để đọc yêu cầu tìm sân tiếng Việt. Không cần khóa API AI. Khi model lỗi hoặc hết hạn mức miễn phí, chatbot tự chuyển sang quy tắc tìm kiếm.
 3. Trong dự án Pages `tranhoan05`, đặt biến môi trường production `BACKEND_ORIGIN` bằng gốc HTTPS của Worker, không có `/api` ở cuối. Redeploy Pages từ nhánh `main` để hàm proxy đọc biến mới.
 4. Đặt secret `ADMIN_PASSWORD` riêng cho Worker bằng `wrangler secret put ADMIN_PASSWORD --config worker/wrangler.jsonc`, rồi chạy `wrangler deploy --config worker/wrangler.jsonc --durable-objects-code-update-mode immediate` để Durable Object nhận cấu hình mới ngay. Không ghi mật khẩu vào Git. Số đăng nhập quản trị là `0900000000`.
 
@@ -57,7 +57,7 @@ Copy-Item .\backend\.env.example .\backend\.env
 
 | Biến cấu hình | Tác dụng |
 | --- | --- |
-| `GEMINI_API_KEY`, `GEMINI_MODEL` | Bật Gemini để chuyển câu tiếng Việt thành bộ lọc. Dùng tên model hỗ trợ JSON theo [tài liệu Gemini](https://ai.google.dev/gemini-api/docs/structured-output). Khi thiếu cấu hình hoặc dịch vụ gián đoạn, giao diện báo đang tìm bằng quy tắc. |
+| `GEMINI_API_KEY`, `GEMINI_MODEL` | Chỉ dùng cho backend chạy Node.js ngoài Cloudflare. Trên Worker, binding Workers AI được ưu tiên và không cần khóa Gemini. Dùng tên model Gemini hỗ trợ JSON theo [tài liệu Gemini](https://ai.google.dev/gemini-api/docs/structured-output). Khi dịch vụ AI gián đoạn, chatbot chuyển sang quy tắc. |
 | `ORS_API_KEY` | Hiện quãng đường lái xe và vẽ tuyến với [openrouteservice](https://openrouteservice.org/). Khi thiếu khóa hoặc API gián đoạn, danh sách ghi khoảng cách đường chim bay và trang sân có nút mở chỉ đường ngoài. [Máy chủ bản đồ OpenStreetMap](https://operations.osmfoundation.org/policies/tiles/) có chính sách sử dụng riêng. |
 | `DEMO_MODE=false`, `ADMIN_PASSWORD` | Chuyển sang cơ sở dữ liệu riêng cho vận hành. Đặt mật khẩu quản trị từ 12 ký tự khi khởi tạo. Chỉ sân đã được quản trị viên xác minh mới có thể nhận đặt. |
 | `PUBLIC_ORIGIN`, `PAYOS_CLIENT_ID`, `PAYOS_API_KEY`, `PAYOS_CHECKSUM_KEY` | Đặt địa chỉ HTTPS thật của website và khóa từ kênh [payOS](https://payos.vn/docs/sdks/back-end/node/). Trỏ webhook về `<PUBLIC_ORIGIN>/api/payments/payos/webhook`. Bản triển khai sử dụng một kênh nhận tiền cho nền tảng. |
