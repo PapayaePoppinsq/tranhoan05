@@ -33,6 +33,7 @@
 
 .detail-columns > *, .admin-columns > * { min-width: 0; }
 .quick-insight { display: grid; gap: 4px; margin: 12px 0; padding: 11px 13px; border-left: 3px solid var(--forest); background: #edf5eb; border-radius: 7px; font-size: .82rem; line-height: 1.5; }
+.quick-form .quick-preference { grid-column: 1 / -1; }
 .quick-insight strong { color: var(--deep); }
 .quick-insight span { color: var(--muted); }
 .result-best { border-color: #7da986; background: #f7fbf5; }

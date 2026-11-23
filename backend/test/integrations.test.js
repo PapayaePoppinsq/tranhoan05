@@ -1,6 +1,26 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { interpret, naturalReply } from '../src/integrations.js';
+import { interpret, naturalReply, rankQuickWithAI } from '../src/integrations.js';
+
+test('Gemma may reorder only checked quick-booking choices', async () => {
+  const recommendation = { results:[0,1,2,3].map((index) => ({ venueId:index + 1,
+    venueName:`Sân ${index + 1}`, courtName:'Sân nhỏ 1', date:'2026-11-25', time:'19:00',
+    end:'20:00', amount:100000 + index * 10000, area:'Thái Nguyên', reason:'Khung giờ còn trống' })),
+  insight:{ bookableVenueCount:4 } };
+  const ai = { async run(model, input) {
+    assert.equal(model,'@cf/google/gemma-4-26b-a4b-it');
+    assert.match(input.messages[1].content,/ưu tiên sân rẻ/);
+    return { response:'{"order":[2,0,1]}' };
+  } };
+  const ranked = await rankQuickWithAI({ ai }, recommendation, 'ưu tiên sân rẻ');
+  assert.equal(ranked.mode,'ai');
+  assert.deepEqual(ranked.results.map(({venueId}) => venueId),[3,1,2]);
+  assert.equal(ranked.results[0].amount,recommendation.results[2].amount);
+  const invalid = await rankQuickWithAI({ ai:{ async run() { return { response:'{"order":[9,0,1]}' }; } } },
+    recommendation);
+  assert.equal(invalid.mode,'rules');
+  assert.deepEqual(invalid.results.map(({venueId}) => venueId),[1,2,3]);
+});
 
 test('Workers AI extracts Vietnamese search criteria without controlling booking data', async () => {
   let prompt;

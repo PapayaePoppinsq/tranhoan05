@@ -257,6 +257,30 @@ test('quick booking learns from completed bookings and suggests several days', a
   assert.equal(new Set(automatic.results.map(({date}) => date)).size,automatic.results.length);
 });
 
+test('quick endpoint uses Gemma without letting it create a booking option', async (t) => {
+  const ai = { async run(_model, input) {
+    assert.match(input.messages[1].content,/ưu tiên tối thứ Bảy/);
+    return { response:'{"order":[1,0,2]}' };
+  } };
+  const service = await createApp({ demo:true, paymentMode:'demo', database:':memory:',
+    origin:'http://localhost:5173', ai });
+  const app = service.app.listen(0,'127.0.0.1');
+  await once(app,'listening');
+  t.after(async () => { await new Promise((resolve) => app.close(resolve)); service.db.close(); });
+  const response = await fetch(`http://127.0.0.1:${app.address().port}/api/quick`, { method:'POST',
+    headers:{ 'Content-Type':'application/json' }, body:JSON.stringify({ preference:'ưu tiên tối thứ Bảy' }) });
+  assert.equal(response.status,200);
+  const body = await response.json();
+  assert.equal(body.mode,'ai');
+  assert.equal(body.results.length,3);
+  for (const result of body.results) {
+    const quote = await fetch(`http://127.0.0.1:${app.address().port}/api/quote`, { method:'POST',
+      headers:{ 'Content-Type':'application/json' }, body:JSON.stringify(result) });
+    assert.equal(quote.status,200);
+    assert.equal((await quote.json()).amount,result.amount);
+  }
+});
+
 test('admin adds a verified venue, assigns a registered owner, and can add and close a court', async () => {
   const owner = await signUp(16);
   const other = await signUp(17);

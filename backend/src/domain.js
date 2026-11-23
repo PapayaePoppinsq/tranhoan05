@@ -210,7 +210,7 @@ export function suggest(db, { date, after, before, duration = 60, area, maxPrice
   }).slice(0, options.limit ?? 3).map(({ score, ...result }) => options.includeScore ? { ...result, score } : result);
 }
 
-export function recommendQuick(db, filters, user, demo) {
+export function recommendQuick(db, filters, user, demo, limit = 3) {
   const dates = filters.date ? [filters.date] : Array.from({ length:7 }, (_, offset) => dateAt(offset));
   const candidates = dates.flatMap((date, dayIndex) => suggest(db, { ...filters, date }, user, demo,
     { limit:6, includeScore:true }).map((result) => ({ ...result, score:result.score - dayIndex * 3 })));
@@ -219,10 +219,10 @@ export function recommendQuick(db, filters, user, demo) {
   for (const result of candidates) {
     if (!filters.date && usedDays.has(result.date)) continue;
     selected.push(result); usedDays.add(result.date);
-    if (selected.length === 3) break;
+    if (selected.length === limit) break;
   }
   for (const result of candidates) {
-    if (selected.length === 3) break;
+    if (selected.length === limit) break;
     if (!selected.includes(result)) selected.push(result);
   }
   const historyCount = user ? db.prepare("SELECT count(*) AS n FROM bookings WHERE user_id=? AND status='confirmed'")

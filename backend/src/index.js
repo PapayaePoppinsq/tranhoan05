@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { createDatabase, syncDirectory, syncDirectoryPhotos, transaction } from './db.js';
 import { HttpError, availability, bookingSelect, dateAt, getVenue, listVenues, minute, now, quoteBooking,
   recordPayment, recommendQuick, reserve, showBooking, suggest, textKey, validDate } from './domain.js';
-import { daySchema, timeSchema, originSchema, filterSchema, chatContextSchema, interpret, naturalReply, mapDistances, mapRoute } from './integrations.js';
+import { daySchema, timeSchema, originSchema, filterSchema, chatContextSchema, interpret, naturalReply, rankQuickWithAI, mapDistances, mapRoute } from './integrations.js';
 import { logIn, logOut, matchPassword, passwordHash, phoneKey, requireUser, seedAdmin, sessionUser, userView } from './auth.js';
 import { createPayments } from './payments.js';
 import { localHosts, protectRequests, securityHeaders } from './http-security.js';
@@ -203,9 +203,11 @@ export async function createApp(config, database) {
     const venue = getVenue(db, idSchema.parse(req.params.id));
     res.json(await mapRoute(config, origin, venue));
   });
-  router.post('/quick', searchLimit, (req, res) => {
-    const filters = filterSchema.extend({ origin: originSchema.optional(), venueId: idSchema.optional() }).parse(req.body);
-    res.json(recommendQuick(db, filters, req.user, config.demo));
+  router.post('/quick', searchLimit, async (req, res) => {
+    const { preference, ...filters } = filterSchema.extend({ origin: originSchema.optional(),
+      venueId: idSchema.optional(), preference:z.string().trim().max(200).default('') }).parse(req.body);
+    const recommendation = recommendQuick(db, filters, req.user, config.demo, 8);
+    res.json(await rankQuickWithAI(config, recommendation, preference));
   });
   router.post('/chat', chatLimit, async (req, res) => {
     const { message, context, origin, history = [] } = z.object({ message: z.string().trim().min(1).max(500),
