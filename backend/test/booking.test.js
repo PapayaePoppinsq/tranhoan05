@@ -66,6 +66,23 @@ test('directory questions list real venues without inventing a playing date', as
   assert.match(named.body.reply, /90\.000/);
 });
 
+test('small talk and help do not trigger booking search, and a follow-up remembers the venue', async () => {
+  const greeting = await request('/chat', { body:{ message:'Chào bạn, hôm nay thế nào?' } });
+  assert.deepEqual(greeting.body.criteria, {});
+  assert.deepEqual(greeting.body.results, []);
+  assert.match(greeting.body.reply, /Chào bạn/);
+  const help = await request('/chat', { body:{ message:'Tôi muốn tìm sân gần nhà thì làm sao?' } });
+  assert.deepEqual(help.body.criteria, {});
+  assert.deepEqual(help.body.results, []);
+  assert.match(help.body.reply, /Chọn vị trí/);
+  const followUp = await request('/chat', { body:{ message:'Sân ấy giá sao?', history:[
+    { role:'user', content:'Sân Quang Minh có bao nhiêu sân?' },
+    { role:'assistant', content:'Sân Pickleball Quang Minh có 5 sân nhỏ.' },
+  ] } });
+  assert.match(followUp.body.reply, /Quang Minh/);
+  assert.match(followUp.body.reply, /90\.000/);
+});
+
 test('directory details backfill existing venues without changing their booking settings or favorites', () => {
   const existing = createDatabase(':memory:');
   try {

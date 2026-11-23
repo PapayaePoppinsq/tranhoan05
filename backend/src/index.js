@@ -213,27 +213,49 @@ export async function createApp(config, database) {
       })).max(4).optional() }).parse(req.body);
     const venues = listVenues(db);
     const areas = [...new Set(venues.map((v) => v.area))];
-    const { criteria, mode } = await interpret(config, message, areas);
-    const combined = { ...context, ...criteria };
+    const words = textKey(message);
+    const howQuestion = /\b(lam sao|cach nao|cach dung|huong dan|su dung|tinh nang)\b/.test(words);
+    const greeting = /^(?:chao|hello|hi\b|cam on\b|thanks\b|ok\b|oke\b)/.test(words) &&
+      !/\b(tim san|dat san|choi san|gia san)\b/.test(words) || /\b(khoe khong|hom nay the nao)\b/.test(words);
+    const { criteria, mode } = greeting || howQuestion ? { criteria:{}, mode:config.ai ? 'ai' : 'demo' } :
+      await interpret(config, message, areas);
+    let combined = { ...context, ...criteria };
     const startingArea = combined.area || Boolean(origin);
     const nameKey = (value) => textKey(value).replace(/[^a-z0-9]+/g, ' ').trim();
-    const query = ` ${nameKey(message)} `;
-    const namedVenues = venues.filter(({ name }) => {
+    const namesIn = (text) => venues.filter(({ name }) => {
+      const query = ` ${nameKey(text)} `;
       const exactName = nameKey(name);
       const shortName = nameKey(name.replace(/\([^)]*\)/g, ''))
         .replace(/\b(?:san|pickleball|club|clb)\b/g, ' ').replace(/\s+/g, ' ').trim();
       return query.includes(` ${exactName} `) || (shortName.length >= 3 && query.includes(` ${shortName} `));
     });
+    let namedVenues = namesIn(message);
+    if (!namedVenues.length && /\b(san do|san ay|cho do|dia diem do)\b/.test(textKey(message))) {
+      for (const turn of [...history].reverse()) {
+        if (turn.role === 'user' && (namedVenues = namesIn(turn.content)).length) break;
+      }
+    }
+    const directoryQuestion = /\b(co nhung san nao|co san nao|nhung san nao|danh sach san)\b/.test(words);
+    const venueQuestion = /\b(bao nhieu san|gia|mat san|mai che|trong nha|ngoai troi|gio mo|mo cua|phu phi)\b/.test(words);
+    const bookingRequest = /\b(tim san|dat san|choi san|con gio|con trong|gio trong)\b/.test(words);
+    const intent = greeting ? 'social' : howQuestion ? 'help' : bookingRequest ? 'booking' :
+      directoryQuestion || venueQuestion ? 'info' : 'booking';
+    if (intent === 'social' || intent === 'help') combined = {};
     const matchingVenues = namedVenues.length ? namedVenues : combined.area ? venues.filter((venue) =>
       textKey(`${venue.area} ${venue.name} ${venue.address}`).includes(textKey(combined.area))) : venues;
     let reply, results = [];
-    if (!combined.date) {
-      const directoryQuestion = /\b(co nhung san nao|co san nao|nhung san nao|danh sach san)\b/.test(textKey(message));
-      reply = directoryQuestion && combined.area ? matchingVenues.length ?
-        `Danh bạ ghi ${matchingVenues.length} cụm sân ở ${combined.area}, ${matchingVenues.length > 4 ? 'ví dụ' : 'gồm'} ${matchingVenues.slice(0, 4).map((venue) => venue.name).join(', ')}. Thông tin chưa được chủ sân xác minh.` :
-        `Danh bạ chưa ghi nhận cụm sân ở ${combined.area}.` : 'Bạn muốn chơi hôm nay hay ngày nào?';
+    if (intent === 'social') reply = /\b(cam on|thanks)\b/.test(words) ?
+      'Không có gì! Khi cần tìm sân hoặc hỏi thông tin một địa điểm, bạn cứ nhắn mình nhé.' :
+      'Chào bạn! Bạn có thể hỏi mình về sân ở Thái Nguyên hoặc nhờ tìm sân theo ngày, giờ và khu vực.';
+    else if (intent === 'help') reply = /\b(gan nha|gan toi|gan minh|gan day)\b/.test(words) ?
+      'Bấm Chọn vị trí trong khung chat hoặc nhập khu vực; sau đó cho mình ngày, giờ và ngân sách để tìm sân phù hợp.' :
+      'Bạn có thể nói ngày, giờ, khu vực và ngân sách; mình sẽ lọc sân phù hợp. Bạn cũng có thể hỏi giá, giờ mở cửa hoặc số sân nhỏ của một địa điểm.';
+    else if (intent === 'info' || !combined.date) {
+      reply = directoryQuestion ? matchingVenues.length ?
+        `Danh bạ ghi ${matchingVenues.length} cụm sân${combined.area ? ` ở ${combined.area}` : ''}, ${matchingVenues.length > 4 ? 'ví dụ' : 'gồm'} ${matchingVenues.slice(0, 4).map((venue) => venue.name).join(', ')}. Thông tin chưa được chủ sân xác minh.` :
+        `Danh bạ chưa ghi nhận cụm sân${combined.area ? ` ở ${combined.area}` : ''}.` : 'Bạn muốn chơi hôm nay hay ngày nào?';
       const venue = namedVenues.length === 1 ? namedVenues[0] : null;
-      if (venue?.directory_details && /\b(gia|bao nhieu san|mat san|mai che|trong nha|ngoai troi)\b/.test(textKey(message))) {
+      if (venue?.directory_details && venueQuestion) {
         const { courtCount, courtType, surface, prices } = venue.directory_details;
         reply = `${venue.name} có ${courtCount} sân nhỏ, loại sân ${courtType.toLowerCase()}, mặt sân ${surface}. Giá thấp điểm tham khảo ${prices.offPeak.toLocaleString('vi-VN')} ₫/giờ. Xem trang chi tiết để tra bảng giá và phụ phí theo khung giờ.`;
       }
@@ -246,20 +268,29 @@ export async function createApp(config, database) {
     else if (combined.after && combined.before && combined.after >= combined.before) reply = 'Giờ bắt đầu cần sớm hơn giờ kết thúc. Bạn muốn tìm khung nào?';
     else {
       const venueId = namedVenues.length === 1 ? namedVenues[0].id : undefined;
-      results = suggest(db, { ...combined, origin, venueId }, req.user, config.demo);
+      results = config.paymentMode === 'off' ? [] : suggest(db, { ...combined, origin, venueId }, req.user, config.demo);
       reply = results.length ? `Mình tìm được ${results.length} khung giờ phù hợp, mặc định ${combined.duration ?? 60} phút. Chọn một khung để xem lại đơn.` :
+        config.paymentMode === 'off' ? 'Đặt sân trực tuyến chưa mở vì thanh toán chưa được cấu hình. Bạn vẫn có thể xem thông tin sân và liên hệ chủ sân.' :
         !config.demo && venues.every((venue) => !venue.verified || !venue.court_count) ?
           'Hiện chưa có sân nào được xác minh và mở nhận đặt. Bạn có thể xem thông tin các cụm sân ở trang tìm sân.' :
           'Chưa có sân phù hợp với các điều kiện này. Thử chọn giờ, khu vực hoặc mức giá khác.';
     }
-    const facts = { venueCount:venues.length, bookableVenueCount:venues.filter((venue) => venue.verified && venue.court_count).length,
-      venueSamples:matchingVenues.slice(0, 4).map((venue) => ({ name:venue.name, area:venue.area,
+    const facts = { venueCount:venues.length, bookableVenueCount:config.paymentMode === 'off' ? 0 :
+      venues.filter((venue) => venue.verified && venue.court_count).length,
+      originProvided:Boolean(origin), paymentReady:config.paymentMode !== 'off',
+      venueSamples:(intent === 'social' || intent === 'help' ? [] : matchingVenues.slice(0, 4)).map((venue) => ({ name:venue.name, area:venue.area,
         directoryHours:`${venue.open}-${venue.close}`, verifiedForBooking:Boolean(venue.verified && venue.court_count),
-        directoryReference:venue.directory_details })),
+        directoryReference:venue.directory_details && {
+          courtCount:venue.directory_details.courtCount, courtType:venue.directory_details.courtType,
+          surface:venue.directory_details.surface, prices:venue.directory_details.prices,
+          ...(namedVenues.some((named) => named.id === venue.id) ? {
+            weekdayRates:venue.directory_details.weekdayRates, weekendRates:venue.directory_details.weekendRates,
+            courts:venue.directory_details.courts } : {}),
+        } })),
       results:results.map(({ venueName, area, date, time, end, amount, reason }) =>
         ({ venueName, area, date, time, end, amount, reason })) };
     const response = config.ai ? await naturalReply(config, { message, history, criteria:combined,
-      facts, fallback:reply }) : { reply, mode };
+      facts, fallback:reply, intent }) : { reply, mode };
     res.json({ reply:response.reply, results, criteria: combined, mode:response.mode });
   });
 

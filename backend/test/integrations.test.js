@@ -39,6 +39,15 @@ test('explicit price and hour in Vietnamese override inaccurate model numbers', 
   assert.equal(result.criteria.after, '19:00');
 });
 
+test('first-person tôi does not become an evening time filter', async () => {
+  const ai = { async run() { return { response:'{"after":"18:00","near":true}' }; } };
+  const result = await interpret({ ai }, 'Tôi muốn tìm sân gần nhà thì làm sao?', []);
+  assert.equal(result.criteria.after, undefined);
+  assert.equal(result.criteria.near, true);
+  const fallback = await interpret({}, 'Tôi muốn tìm sân gần nhà thì làm sao?', []);
+  assert.equal(fallback.criteria.after, undefined);
+});
+
 test('natural response uses checked facts and short conversation history', async () => {
   let sent;
   const ai = { async run(_model, input) {
@@ -69,4 +78,11 @@ test('natural response cannot ask for a date already known or promise unavailabl
     criteria:{ date:'2026-11-24' }, facts:{ bookableVenueCount:0, results:[] },
     fallback:'Hiện chưa có sân nào mở nhận đặt.' });
   assert.deepEqual(result, { reply:'Hiện chưa có sân nào mở nhận đặt.', mode:'fallback' });
+});
+
+test('social reply cannot invent the current calendar date', async () => {
+  const ai = { async run() { return { response:'Hôm nay là thứ 2, ngày 14 tháng 5 năm 2024.' }; } };
+  const result = await naturalReply({ ai }, { message:'Chào bạn, hôm nay thế nào?', history:[],
+    criteria:{}, facts:{ results:[], paymentReady:false }, fallback:'Chào bạn!', intent:'social' });
+  assert.deepEqual(result, { reply:'Chào bạn!', mode:'fallback' });
 });
