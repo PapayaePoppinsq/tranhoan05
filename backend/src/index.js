@@ -6,7 +6,7 @@ import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { createDatabase, syncDirectory, syncDirectoryPhotos, transaction } from './db.js';
 import { HttpError, availability, bookingSelect, dateAt, getVenue, listVenues, minute, now, quoteBooking,
-  recordPayment, reserve, showBooking, suggest, textKey, validDate } from './domain.js';
+  recordPayment, recommendQuick, reserve, showBooking, suggest, textKey, validDate } from './domain.js';
 import { daySchema, timeSchema, originSchema, filterSchema, chatContextSchema, interpret, naturalReply, mapDistances, mapRoute } from './integrations.js';
 import { logIn, logOut, matchPassword, passwordHash, phoneKey, requireUser, seedAdmin, sessionUser, userView } from './auth.js';
 import { createPayments } from './payments.js';
@@ -205,9 +205,7 @@ export async function createApp(config, database) {
   });
   router.post('/quick', searchLimit, (req, res) => {
     const filters = filterSchema.extend({ origin: originSchema.optional(), venueId: idSchema.optional() }).parse(req.body);
-    let results = suggest(db, { ...filters, date: filters.date ?? dateAt() }, req.user, config.demo);
-    if (!filters.date && !results.length) results = suggest(db, { ...filters, date: dateAt(1) }, req.user, config.demo);
-    res.json({ results });
+    res.json(recommendQuick(db, filters, req.user, config.demo));
   });
   router.post('/chat', chatLimit, async (req, res) => {
     const { message, context, origin, history = [] } = z.object({ message: z.string().trim().min(1).max(500),

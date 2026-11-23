@@ -62,9 +62,10 @@ export function CourtCard({ venue, saved, onSave, distance, date, after, demo })
   </div></article>;
 }
 
-export function ResultList({ results, onChoose }) {
-  return <div className="results">{results.map((result) => <article className="result" key={`${result.courtId}:${result.time}`}>
-    <div><strong>{result.venueName}</strong><p>{result.courtName} · {result.time}–{result.end} · {longDate(result.date)}</p>
+export function ResultList({ results, onChoose, highlightFirst = false }) {
+  return <div className="results">{results.map((result, index) => <article className={`result ${highlightFirst && index === 0 ? 'result-best' : ''}`} key={`${result.courtId}:${result.date}:${result.time}`}>
+    <div>{highlightFirst && index === 0 && <span className="result-tag">Gợi ý phù hợp nhất</span>}
+      <strong>{result.venueName}</strong><p>{result.courtName} · {result.time}–{result.end} · {longDate(result.date)}</p>
       <small>{result.reason}</small></div><div><strong>{money(result.amount)}</strong>
       <Link onClick={onChoose} to={reviewUrl(result)} className="small-button">Xem lại đơn</Link></div>
   </article>)}</div>;

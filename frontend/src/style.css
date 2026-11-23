@@ -32,6 +32,12 @@
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important}}
 
 .detail-columns > *, .admin-columns > * { min-width: 0; }
+.quick-insight { display: grid; gap: 4px; margin: 12px 0; padding: 11px 13px; border-left: 3px solid var(--forest); background: #edf5eb; border-radius: 7px; font-size: .82rem; line-height: 1.5; }
+.quick-insight strong { color: var(--deep); }
+.quick-insight span { color: var(--muted); }
+.result-best { border-color: #7da986; background: #f7fbf5; }
+.result-tag { display: block; margin-bottom: 5px; color: var(--forest); font-size: .73rem; font-weight: 750; }
+.result small { display: block; margin-top: 4px; line-height: 1.45; }
 .detail-title, .summary-list dd, .order-row h2, .admin-venue { overflow-wrap: anywhere; }
 
 @media (max-width: 780px) {

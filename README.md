@@ -75,12 +75,14 @@ Copy-Item .\backend\.env.example .\backend\.env
 
 Tìm thủ công, Đặt nhanh và Chatbot cùng đi qua **Xem lại đơn**. Backend tính lại giá và ghi giữ chỗ bằng giao dịch SQLite. Trigger trong cơ sở dữ liệu chặn các khoảng giờ chồng lấn trên một sân, kể cả khi hai yêu cầu tới cùng lúc. Giữ chỗ hết hạn sau tối đa 10 phút hoặc khi tới giờ bắt đầu. Với payOS, backend xác minh chữ ký, đối chiếu mã đơn, mã liên kết, tiền tệ và số tiền. Webhook lặp được xử lý một lần. Thanh toán đúng nhưng tới muộn chuyển sang đối soát.
 
+**Đặt nhanh thông minh** tự tìm khung trống trong bảy ngày tới nếu khách không chọn ngày. Hệ thống xếp gợi ý theo sân đã lưu, số lần đặt thành công tại sân, thứ và giờ thường chơi, khoảng cách đường chim bay nếu khách chọn điểm xuất phát, giá và ngày gần. Mỗi kết quả nêu căn cứ được dùng. Khách vẫn có thể đổi ngày, giờ, ngân sách và phải xem lại đơn trước khi giữ chỗ. Đây là thuật toán gợi ý bằng quy tắc và dữ liệu thật, không phải model AI; chatbot mới dùng Workers AI để hiểu câu chữ. Trên bản chạy thật, chỉ sân đã xác minh và có sân nhỏ hoạt động mới vào danh sách đặt nhanh.
+
 Sau khi khách xác nhận giữ chỗ, web tạo link payOS và hiển thị VietQR của chính đơn ngay trên trang thanh toán. Khách quét bằng app ngân hàng; trên cùng một điện thoại vẫn có nút mở trang payOS. QR chỉ hiện khi đơn còn chờ thanh toán. Tài khoản nhận tiền của chủ kênh vẫn phải liên kết với payOS để xác nhận tự động.
 
 ## Dữ liệu và ảnh
 
 `backend/data/thai-nguyen.csv` là file danh bạ duy nhất, lấy từ `danh_sach_25_san_pickleball_thai_nguyen_day_du-v2.csv`. File có 25 cụm sân và 107 sân nhỏ. Trang chi tiết hiển thị loại sân, mặt sân, bảng giá theo ngày và giờ, danh sách sân nhỏ và phụ phí nếu có. Với dòng ghi cả một khung giờ và “Mở cả ngày”, lịch dùng khung giờ cụ thể. “Mở cả ngày (24/24)” dùng 00:00–24:00.
 
-`backend/data/catalog-photos.json` ghi ảnh đã chọn theo mã, tên và địa chỉ sân, nguồn đối chiếu và lý do bỏ trống. Có 16 ảnh chụp lưu trong `frontend/public/images/san-thuc-te/`. Chín sân còn lại hiện “Chưa có ảnh xác minh” vì dữ liệu chỉ có thẻ giới thiệu, logo hoặc có dấu hiệu khác địa điểm. Trên trang chi tiết, nút **Nguồn ảnh** mở liên kết đối chiếu. Ảnh đầu trang lấy từ [Daniel Gomez](https://unsplash.com/photos/GmkIC2N8lwE).
+`backend/data/catalog-photos.json` ghi ảnh đã chọn theo mã, tên và địa chỉ sân, nguồn đối chiếu và lý do bỏ trống. Có 18 ảnh chụp lưu trong `frontend/public/images/san-thuc-te/`. Bảy sân còn lại hiện sơ đồ với nhãn “Chưa có ảnh chụp sân” vì ảnh nguồn không đủ căn cứ gắn đúng địa điểm. Trên trang chi tiết, nút **Nguồn ảnh** mở liên kết đối chiếu. Ảnh đầu trang lấy từ [Daniel Gomez](https://unsplash.com/photos/GmkIC2N8lwE).
 
 Worker đồng bộ chi tiết CSV theo mã danh bạ vào các cụm sân hiện có. Giá và sân nhỏ trong CSV chỉ phục vụ tham khảo trên web và chatbot. Chế độ thử vẫn dùng một sân thử mỗi địa điểm với giá mô phỏng 100.000 ₫/giờ. Giá đặt thật và lịch trống lấy từ cấu hình vận hành sau khi quản trị viên xác minh.

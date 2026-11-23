@@ -236,6 +236,27 @@ test('permissions, saved venues, and both assisted booking paths', async () => {
   assert.equal((await request('/distances',{body:{lat:21.59,lng:105.82}})).body[0].type,'straight');
 });
 
+test('quick booking learns from completed bookings and suggests several days', async () => {
+  const customer = await signUp(19);
+  const venue = (await request('/venues/2')).body;
+  const courtId = venue.courts[0].id;
+  for (const date of [dateAt(6), dateAt(7)]) {
+    const selection = { courtId, date, time:'19:00', duration:60 };
+    const quote = (await request('/quote',{body:selection})).body;
+    const held = await request('/bookings',{cookie:customer.cookie,body:{...selection,amount:quote.amount}});
+    assert.equal(held.status,201);
+    assert.equal((await request(`/bookings/${held.body.id}/demo-payment`,{cookie:customer.cookie,body:{}})).body.status,'confirmed');
+  }
+  const specific = (await request('/quick',{cookie:customer.cookie,body:{venueId:2,date:dateAt(8)}})).body;
+  assert.equal(specific.insight.historyCount,2);
+  assert.equal(specific.results[0].venueId,2);
+  assert.match(specific.results[0].reason,/Bạn đã đặt sân này 2 lần/);
+  assert.match(specific.results[0].reason,/Gần giờ bạn hay chơi/);
+  const automatic = (await request('/quick',{cookie:customer.cookie,body:{venueId:2}})).body;
+  assert.equal(automatic.insight.searchedDays,7);
+  assert.equal(new Set(automatic.results.map(({date}) => date)).size,automatic.results.length);
+});
+
 test('admin adds a verified venue, assigns a registered owner, and can add and close a court', async () => {
   const owner = await signUp(16);
   const other = await signUp(17);

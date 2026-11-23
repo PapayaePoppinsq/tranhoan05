@@ -154,13 +154,22 @@ export function distanceKm({ lat, lng }, venue) {
   return 6371 * 2 * Math.asin(Math.min(1, Math.sqrt(a)));
 }
 
-export function suggest(db, { date, after, before, duration = 60, area, maxPrice, origin, venueId, venueIds }, user, demo) {
+export function suggest(db, { date, after, before, duration = 60, area, maxPrice, origin, venueId, venueIds }, user, demo, options = {}) {
   if (!validDate(date)) throw new HttpError(400, 'Chọn ngày trong 30 ngày tới.');
   const saved = new Set(user ? db.prepare('SELECT venue_id FROM favorites WHERE user_id=?').all(user.id)
     .map(({ venue_id }) => venue_id) : []);
   const history = user ? db.prepare(`SELECT c.venue_id,b.starts FROM bookings b JOIN courts c ON c.id=b.court_id
-    WHERE b.user_id=? AND b.status='confirmed' ORDER BY b.created DESC LIMIT 20`).all(user.id) : [];
-  const lastHour = history[0] ? minute(slotTime(history[0].starts)) : 19 * 60;
+    WHERE b.user_id=? AND b.status='confirmed' ORDER BY b.created DESC LIMIT 40`).all(user.id) : [];
+  const weekday = new Date(`${date}T12:00:00Z`).getUTCDay();
+  const venueCount = new Map(), weekdayCount = new Map(), hourCount = new Map();
+  for (const booking of history) {
+    const bookingDay = new Date(`${slotDate(booking.starts)}T12:00:00Z`).getUTCDay();
+    const bookingHour = minute(slotTime(booking.starts));
+    venueCount.set(booking.venue_id, (venueCount.get(booking.venue_id) || 0) + 1);
+    weekdayCount.set(bookingDay, (weekdayCount.get(bookingDay) || 0) + 1);
+    hourCount.set(bookingHour, (hourCount.get(bookingHour) || 0) + 1);
+  }
+  const usualHour = [...hourCount].sort((a, b) => b[1] - a[1])[0]?.[0] ?? 19 * 60;
   const results = [];
   for (const venue of listVenues(db)) {
     if (venueId && venue.id !== venueId) continue;
@@ -171,13 +180,24 @@ export function suggest(db, { date, after, before, duration = 60, area, maxPrice
     for (const court of availability(db, getVenue(db, venue.id, demo), date, duration)) {
       for (const slot of court.slots) {
         if (slot.status !== 'available' || (after && slot.time < after) || (before && slot.end > before)) continue;
-        const preferred = history.some((booking) => booking.venue_id === venue.id);
-        const score = Number(saved.has(venue.id)) * 24 + Number(preferred) * 20 - (km ?? 0) * 3 -
-          Math.abs(minute(slot.time) - lastHour) / 24 - slot.amount / 50000;
+        const previousVisits = venueCount.get(venue.id) || 0;
+        const sameWeekday = weekdayCount.get(weekday) || 0;
+        const timeDifference = Math.abs(minute(slot.time) - usualHour);
+        const sameHour = [...hourCount].reduce((count, [hour, times]) =>
+          count + (Math.abs(minute(slot.time) - hour) <= 30 ? times : 0), 0);
+        const score = Number(saved.has(venue.id)) * 18 + Math.min(previousVisits, 3) * 8 +
+          Math.min(sameWeekday, 3) * 5 + Math.min(sameHour, 3) * 7 -
+          timeDifference / (history.length ? 30 : 45) - (km ?? 0) * 2 - slot.amount / 50000;
+        const reasons = [];
+        if (previousVisits) reasons.push(`Bạn đã đặt sân này ${previousVisits} lần`);
+        if (saved.has(venue.id)) reasons.push('Sân bạn đã lưu');
+        if (sameWeekday >= 2) reasons.push('Đúng thứ bạn hay chơi');
+        if (sameHour >= 2) reasons.push('Gần giờ bạn hay chơi');
+        if (km != null) reasons.push(`Cách ${km.toFixed(1)} km đường chim bay`);
+        reasons.push('Khung giờ còn trống');
         results.push({ venueId: venue.id, venueName: venue.name, area: venue.area, courtId: court.id,
           courtName: court.name, date, time: slot.time, end: slot.end, duration, amount: slot.amount,
-          reason: saved.has(venue.id) ? 'Sân bạn đã lưu' : preferred ? 'Sân bạn từng đặt' :
-            km != null ? `Cách ${km.toFixed(1)} km đường chim bay` : 'Còn giờ trống phù hợp', score });
+          reason: reasons.slice(0, 3).join(' · '), score });
       }
     }
   }
@@ -187,5 +207,29 @@ export function suggest(db, { date, after, before, duration = 60, area, maxPrice
     if (selected.has(key)) return false;
     selected.add(key);
     return true;
-  }).slice(0, 3).map(({ score, ...result }) => result);
+  }).slice(0, options.limit ?? 3).map(({ score, ...result }) => options.includeScore ? { ...result, score } : result);
+}
+
+export function recommendQuick(db, filters, user, demo) {
+  const dates = filters.date ? [filters.date] : Array.from({ length:7 }, (_, offset) => dateAt(offset));
+  const candidates = dates.flatMap((date, dayIndex) => suggest(db, { ...filters, date }, user, demo,
+    { limit:6, includeScore:true }).map((result) => ({ ...result, score:result.score - dayIndex * 3 })));
+  candidates.sort((a, b) => b.score - a.score || a.date.localeCompare(b.date));
+  const selected = [], usedDays = new Set();
+  for (const result of candidates) {
+    if (!filters.date && usedDays.has(result.date)) continue;
+    selected.push(result); usedDays.add(result.date);
+    if (selected.length === 3) break;
+  }
+  for (const result of candidates) {
+    if (selected.length === 3) break;
+    if (!selected.includes(result)) selected.push(result);
+  }
+  const historyCount = user ? db.prepare("SELECT count(*) AS n FROM bookings WHERE user_id=? AND status='confirmed'")
+    .get(user.id).n : 0;
+  const favoriteCount = user ? db.prepare('SELECT count(*) AS n FROM favorites WHERE user_id=?').get(user.id).n : 0;
+  const bookableVenueCount = db.prepare(`SELECT count(DISTINCT v.id) AS n FROM venues v JOIN courts c ON c.venue_id=v.id
+    WHERE v.active=1 AND c.active=1 AND (?=1 OR v.verified=1 AND c.is_demo=0)`).get(Number(demo)).n;
+  return { results:selected.map(({ score, ...result }) => result), insight:{ historyCount, favoriteCount,
+    locationUsed:Boolean(filters.origin), bookableVenueCount, searchedDays:dates.length } };
 }

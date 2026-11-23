@@ -32,28 +32,36 @@ function PositionDialog({ onClose }) {
 }
 
 function QuickDialog({ onClose }) {
-  const { origin } = useSite();
+  const { origin, user } = useSite();
   const todayValue = today();
   const [date, setDate] = useState(''), [budget, setBudget] = useState(''), [after, setAfter] = useState('');
-  const [results, setResults] = useState(null), [busy, setBusy] = useState(false), [error, setError] = useState('');
+  const [results, setResults] = useState(null), [insight, setInsight] = useState(null);
+  const [busy, setBusy] = useState(false), [error, setError] = useState('');
   async function suggest(event) {
-    event?.preventDefault(); setBusy(true); setError(''); setResults(null);
+    event?.preventDefault(); setBusy(true); setError(''); setResults(null); setInsight(null);
     try {
       const data = await api('/quick', { body:{ date:date || undefined, after:after || undefined,
         maxPrice:budget === '' ? undefined : Number(budget), origin:origin || undefined } });
-      setResults(data.results);
+      setResults(data.results); setInsight(data.insight);
     } catch (e) { setError(e.message); }
     finally { setBusy(false); }
   }
   useEffect(() => { suggest(); }, []);
   return <Dialog title="Đặt nhanh thông minh" icon={<Zap size={22}/>} onClose={onClose}>
-    <p className="muted">Gợi ý khung trống dựa trên vị trí, ngân sách, sân đã lưu và lịch sử đặt của bạn.</p>
-    <form onSubmit={suggest} className="quick-form"><label>Ngày chơi<input type="date" min={todayValue} max={today(30)} value={date} onChange={(e) => setDate(e.target.value)}/></label>
+    <p className="muted">Tự tìm giờ trống trong 7 ngày tới. Có lịch sử đặt hoặc sân đã lưu, hệ thống sẽ ưu tiên theo thói quen của bạn.</p>
+    <form onSubmit={suggest} className="quick-form"><label>Ngày chơi (để trống để tự chọn)<input type="date" min={todayValue} max={today(30)} value={date} onChange={(e) => setDate(e.target.value)}/></label>
       <label>Sau giờ<input type="time" value={after} onChange={(e) => setAfter(e.target.value)}/></label>
       <label>Ngân sách (₫)<input min="0" max="10000000" type="number" value={budget} placeholder="Không giới hạn" onChange={(e) => setBudget(e.target.value)}/></label>
-      <button className="button primary" disabled={busy}>{busy ? 'Đang tìm…' : 'Tìm giờ'}</button></form>
-    <Alert>{error}</Alert>{results?.length ? <ResultList results={results} onChoose={onClose}/> :
-      results && <p className="muted">Chưa tìm được giờ phù hợp. Hãy đổi ngày, giờ hoặc ngân sách.</p>}
+      <button className="button primary" disabled={busy}>{busy ? 'Đang tìm…' : 'Gợi ý lại'}</button></form>
+    <Alert>{error}</Alert>{insight && <div className="quick-insight" role="status">
+      <strong>{insight.bookableVenueCount} cụm sân đang mở đặt trực tuyến</strong>
+      <span>{insight.historyCount ? `Dựa trên ${insight.historyCount} lượt đặt thành công` :
+        user ? 'Bạn chưa có lượt đặt thành công; hệ thống ưu tiên giờ còn trống' : 'Đăng nhập để gợi ý học từ lịch sử đặt'}
+        {insight.favoriteCount ? ` · ${insight.favoriteCount} sân đã lưu` : ''}
+        {insight.locationUsed ? ' · có tính khoảng cách từ điểm bạn chọn' : ''}.</span>
+    </div>}
+    {results?.length ? <ResultList results={results} onChoose={onClose} highlightFirst/> :
+      results && <p className="muted">Chưa có giờ trống phù hợp trong {insight?.searchedDays || 7} ngày đã tìm. Hãy đổi ngày, giờ hoặc ngân sách.</p>}
   </Dialog>;
 }
 
