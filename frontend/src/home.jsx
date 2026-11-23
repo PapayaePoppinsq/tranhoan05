@@ -98,6 +98,8 @@ export function Home() {
           <button aria-label="Bản đồ" aria-pressed={view === 'map'} onClick={() => setView('map')}><Map size={17}/></button></div></div></div>
       {catalogOnly && <div className="info-box" role="status"><strong>Đang hiển thị danh bạ sân</strong>
         <p>Trang này chưa kết nối backend nên chưa có lịch trống, đăng nhập hoặc đặt sân trực tuyến. Khoảng cách hiển thị là đường chim bay; mở từng sân để xem bản đồ và số liên hệ.</p></div>}
+      {site.config?.payment === 'off' && <div className="info-box" role="status"><strong>Đặt sân trực tuyến chưa mở</strong>
+        <p>Bạn có thể xem thông tin và vị trí của 25 sân. Quản trị viên cần xác minh giá, sân nhỏ và cấu hình thanh toán trước khi nhận đặt sân.</p></div>}
       <p className="demo-caption">Thông tin sân và đánh giá lấy từ CSV.{site.config?.demo ? ' Giá và lịch đặt của sân chưa xác minh dùng để chạy thử.' : ''}</p>
       {distanceError && <p className="info-box" role="status">Chưa tính được khoảng cách. {distanceError} <button className="text-button" onClick={() => reload((n) => n + 1)}>Thử lại</button></p>}
       {source.error ? <><Alert>{source.error}</Alert><button className="button secondary" onClick={() => reload((n) => n + 1)}>Thử lại</button></> :

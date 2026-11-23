@@ -1,5 +1,6 @@
 {
   "name": "sanvot-booking-api",
+  "account_id": "f61b8507500ad63dc32adf65d4680c3d",
   "main": "src/index.js",
   "compatibility_date": "2026-10-26",
   "vars": {
