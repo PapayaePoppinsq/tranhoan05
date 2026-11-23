@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { createDatabase, syncDirectory, syncDirectoryPhotos, transaction } from './db.js';
 import { HttpError, availability, bookingSelect, dateAt, getVenue, listVenues, minute, now, quoteBooking,
   recordPayment, reserve, showBooking, suggest, textKey, validDate } from './domain.js';
-import { daySchema, timeSchema, originSchema, filterSchema, interpret, mapDistances, mapRoute } from './integrations.js';
+import { daySchema, timeSchema, originSchema, filterSchema, interpret, naturalReply, mapDistances, mapRoute } from './integrations.js';
 import { logIn, logOut, matchPassword, passwordHash, phoneKey, requireUser, seedAdmin, sessionUser, userView } from './auth.js';
 import { createPayments } from './payments.js';
 import { localHosts, protectRequests, securityHeaders } from './http-security.js';
@@ -207,8 +207,10 @@ export async function createApp(config, database) {
     res.json({ results });
   });
   router.post('/chat', chatLimit, async (req, res) => {
-    const { message, context, origin } = z.object({ message: z.string().trim().min(1).max(500),
-      context: filterSchema.optional(), origin: originSchema.optional() }).parse(req.body);
+    const { message, context, origin, history = [] } = z.object({ message: z.string().trim().min(1).max(500),
+      context: filterSchema.optional(), origin: originSchema.optional(), history:z.array(z.object({
+        role:z.enum(['user','assistant']), content:z.string().trim().min(1).max(500),
+      })).max(4).optional() }).parse(req.body);
     const venues = listVenues(db);
     const areas = [...new Set(venues.map((v) => v.area))];
     const { criteria, mode } = await interpret(config, message, areas);
@@ -229,7 +231,16 @@ export async function createApp(config, database) {
           'Hiện chưa có sân nào được xác minh và mở nhận đặt. Bạn có thể xem thông tin các cụm sân ở trang tìm sân.' :
           'Chưa có sân phù hợp với các điều kiện này. Thử chọn giờ, khu vực hoặc mức giá khác.';
     }
-    res.json({ reply, results, criteria: combined, mode });
+    const matchingVenues = combined.area ? venues.filter((venue) =>
+      textKey(`${venue.area} ${venue.name} ${venue.address}`).includes(textKey(combined.area))) : venues;
+    const facts = { venueCount:venues.length, bookableVenueCount:venues.filter((venue) => venue.verified && venue.court_count).length,
+      venueSamples:matchingVenues.slice(0, 4).map((venue) => ({ name:venue.name, area:venue.area,
+        directoryHours:`${venue.open}-${venue.close}`, verifiedForBooking:Boolean(venue.verified && venue.court_count) })),
+      results:results.map(({ venueName, area, date, time, end, amount, reason }) =>
+        ({ venueName, area, date, time, end, amount, reason })) };
+    const response = mode === 'ai' && config.ai ? await naturalReply(config, { message, history, criteria:combined,
+      facts, fallback:reply }) : { reply, mode };
+    res.json({ reply:response.reply, results, criteria: combined, mode:response.mode });
   });
 
   router.post('/quote', (req, res) => res.json(quoteBooking(db, quoteSchema.parse(req.body), config.demo)));

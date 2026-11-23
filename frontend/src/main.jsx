@@ -69,7 +69,8 @@ function ChatDialog({ onClose }) {
     setInput(''); setBusy(true);
     setLog((messages) => [...messages, { client:true, text }]);
     try {
-      const response = await api('/chat', {body:{message:text, context:context || undefined, origin:origin || undefined}});
+      const history = log.slice(-4).map(({ client, text:content }) => ({ role:client ? 'user' : 'assistant', content }));
+      const response = await api('/chat', {body:{message:text, context:context || undefined, origin:origin || undefined, history}});
       setContext(response.criteria); setMode(response.mode);
       setLog((messages) => [...messages, { text:response.reply, results:response.results }]);
     } catch (e) { setLog((messages) => [...messages, { text:e.message }]); }
@@ -79,10 +80,10 @@ function ChatDialog({ onClose }) {
     <div className="chat-tools"><span>{mode === 'ai' ? 'Chatbot AI' : mode === 'fallback' ? 'AI gián đoạn · đang dùng quy tắc' : 'Chế độ thử · tìm bằng quy tắc'}</span>
       <button className="text-button" onClick={() => setOverlay('position')}>Chọn vị trí</button>
       {log.length > 0 && <button className="text-button" disabled={busy} onClick={() => {setContext(null);setLog([]);}}>Hỏi mới</button>}</div>
-    <div className="chat-log" ref={scroll} aria-live="polite"><p className="chat-bubble">Bạn muốn chơi ngày nào, ở khu vực nào và ngân sách bao nhiêu?</p>
+    <div className="chat-log" ref={scroll} aria-live="polite"><p className="chat-bubble">Chào bạn! Cứ nói bạn muốn chơi lúc nào, ở đâu hoặc hỏi mình về một cụm sân nhé.</p>
       {log.map((message, index) => <div key={index} className={message.client ? 'chat-user' : 'chat-answer'}>
         <p className="chat-bubble">{message.text}</p>{message.results?.length ? <ResultList results={message.results} onChoose={onClose}/> : null}</div>)}
-      {busy && <p className="chat-bubble">Đang kiểm tra lịch sân…</p>}</div>
+      {busy && <p className="chat-bubble">Mình đang xem yêu cầu của bạn…</p>}</div>
     {!log.length && <div className="sample-messages">{examples.map((entry) => <button key={entry} className="chip" onClick={() => send(entry)}>{entry}</button>)}</div>}
     <form onSubmit={(e) => {e.preventDefault();send(input);}} className="chat-form"><input aria-label="Nhập yêu cầu tìm sân" maxLength={500} value={input}
       placeholder="Ví dụ: Chơi tối mai, sau 7 giờ…" onChange={(e) => setInput(e.target.value)}/><button className="button primary" disabled={busy || !input.trim()}>Gửi</button></form>
