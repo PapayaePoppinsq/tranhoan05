@@ -305,6 +305,7 @@ test('payOS QR payload is saved for the pending customer and hidden after confir
     const payload = '000201' + 'A'.repeat(30);
     const client = { paymentRequests:{ create:async (data) => {
       assert.equal(data.amount,100000);
+      assert.match(data.description,/^\d{9}$/);
       return {paymentLinkId:'qr-link',checkoutUrl:'https://pay.payos.vn/web/qr-link',qrCode:payload};
     } } };
     const payments = createPayments(localDb,{origin:'https://example.com',paymentMode:'payos'},client);

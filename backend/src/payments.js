@@ -1,6 +1,14 @@
 import { PayOS } from '@payos/node';
 import { bookingSelect, HttpError, now, recordPayment, showBooking } from './domain.js';
 
+function payosFailure(error) {
+  return {
+    type: typeof error?.name === 'string' && /^[A-Za-z]+Error$/.test(error.name) ? error.name : 'Error',
+    status: Number.isInteger(error?.status) ? error.status : null,
+    code: typeof error?.code === 'string' && /^[A-Za-z0-9_-]{1,24}$/.test(error.code) ? error.code : null,
+  };
+}
+
 export function createPayments(db, config, providedClient) {
   // Keep webhook verification available while new bookings stay closed during setup.
   const client = providedClient ?? (config.payos && Object.values(config.payos).every(Boolean) ? new PayOS(config.payos) : null);
@@ -11,14 +19,27 @@ export function createPayments(db, config, providedClient) {
     let link;
     try {
       link = await client.paymentRequests.create({ orderCode: row.code, amount: row.amount,
-        description: `SV${String(row.code).slice(-12)}`, returnUrl: callback, cancelUrl: callback, expiredAt: row.hold_until },
-      { timeout: 6000, maxRetries: 0 });
-    } catch {
+        description: String(row.code).slice(-9), returnUrl: callback, cancelUrl: callback, expiredAt: row.hold_until },
+      { timeout: 10000, maxRetries: 0 });
+    } catch (createError) {
+      console.warn('payOS create link failed', payosFailure(createError));
       try {
-        const existing = await client.paymentRequests.get(row.code, { timeout: 5000, maxRetries: 0 });
+        const existing = await client.paymentRequests.get(row.code, { timeout: 8000, maxRetries: 0 });
         if (!existing?.id || existing.orderCode !== row.code || existing.amount !== row.amount) throw new Error();
         link = { paymentLinkId: existing.id, checkoutUrl: `https://pay.payos.vn/web/${encodeURIComponent(existing.id)}` };
-      } catch { throw new HttpError(502, 'Chưa tạo được liên kết thanh toán. Hãy thử lại.'); }
+      } catch (lookupError) {
+        console.warn('payOS lookup link failed', payosFailure(lookupError));
+        if (createError?.name === 'InvalidSignatureError' || lookupError?.name === 'InvalidSignatureError') {
+          throw new HttpError(502, 'Không xác minh được phản hồi payOS. Quản trị viên cần kiểm tra Checksum Key.');
+        }
+        if ([401,403].includes(createError?.status) || [401,403].includes(lookupError?.status)) {
+          throw new HttpError(502, 'Kênh payOS chưa xác thực được. Quản trị viên cần kiểm tra Client ID và API Key.');
+        }
+        if (createError?.status === 400) {
+          throw new HttpError(502, 'payOS từ chối thông tin đơn thanh toán. Quản trị viên cần kiểm tra cấu hình kênh.');
+        }
+        throw new HttpError(502, 'Chưa kết nối được payOS. Hãy thử lại sau ít phút.');
+      }
     }
     const url = new URL(link.checkoutUrl);
     if (!link.paymentLinkId || url.protocol !== 'https:' || url.hostname !== 'pay.payos.vn') {
