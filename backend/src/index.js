@@ -238,7 +238,7 @@ export async function createApp(config, database) {
         directoryHours:`${venue.open}-${venue.close}`, verifiedForBooking:Boolean(venue.verified && venue.court_count) })),
       results:results.map(({ venueName, area, date, time, end, amount, reason }) =>
         ({ venueName, area, date, time, end, amount, reason })) };
-    const response = mode === 'ai' && config.ai ? await naturalReply(config, { message, history, criteria:combined,
+    const response = config.ai ? await naturalReply(config, { message, history, criteria:combined,
       facts, fallback:reply }) : { reply, mode };
     res.json({ reply:response.reply, results, criteria: combined, mode:response.mode });
   });
