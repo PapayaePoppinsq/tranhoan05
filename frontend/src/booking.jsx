@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, CalendarDays, CheckCircle2, Clock3, CreditCard, Heart, MapPin, Phone, ShieldCheck, TimerReset } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 import { api, bookingStatus, detailsUrl, isBookingDate, longDate, money, reviewUrl, today, useApi, useCatalog } from './api';
 import { Alert, DateStrip, Empty, Loading, RouteLink, VenuePicture, VenueRating } from './ui';
 import { CourtMap } from './map';
@@ -224,6 +225,7 @@ function PaymentPage({ id }) {
   const [entry, setEntry] = useState(null), [loadError, setLoadError] = useState('');
   const [error, setError] = useState(''), [busy, setBusy] = useState(false), [revision, reload] = useState(0);
   const [clock, tick] = useState(Date.now());
+  const requestedPayment = useRef(false);
   useEffect(() => {
     const controller = new AbortController();
     let poll;
@@ -250,6 +252,12 @@ function PaymentPage({ id }) {
     const timer = setInterval(() => tick(Date.now()), 1000);
     return () => clearInterval(timer);
   }, [entry?.status]);
+  useEffect(() => {
+    if (requestedPayment.current || entry?.provider !== 'payos' || entry.status !== 'pending' ||
+        entry.checkoutUrl || entry.expiresAt <= Math.floor(Date.now() / 1000)) return;
+    requestedPayment.current = true;
+    pay('payment');
+  }, [entry?.provider, entry?.status, entry?.checkoutUrl, entry?.expiresAt, id]);
   async function pay(endpoint) {
     setBusy(true);setError('');
     try {
@@ -271,9 +279,14 @@ function PaymentPage({ id }) {
       <BookingDetails entry={entry}/><div className="total"><span>Số tiền</span><strong>{money(entry.amount)}</strong></div>
       {entry.provider === 'demo' && <p className="demo-caption">Thanh toán mô phỏng · không thu tiền.</p>}
       {entry.status !== 'review' && entry.paymentStatus === 'review' && <p className="info-box">Giao dịch đang cần đối soát số tiền.</p>}
+      {entry.provider === 'payos' && entry.status === 'pending' && left > 0 && entry.qrPayload &&
+        <div className="payment-qr"><QRCodeSVG value={entry.qrPayload} size={236} marginSize={4} level="M"
+          title="Mã VietQR thanh toán đơn đặt sân"/>
+          <div><h2>Quét mã để thanh toán</h2><p>Mở ứng dụng ngân hàng và quét VietQR. Kiểm tra người nhận và số tiền trước khi xác nhận chuyển khoản.</p>
+            <p>Đơn sẽ tự cập nhật khi payOS xác nhận thanh toán.</p></div></div>}
       {entry.status === 'pending' && left > 0 && <div className="form-actions">
         {entry.provider === 'demo' ? <button className="button primary" disabled={busy} onClick={() => pay('demo-payment')}>Mô phỏng thanh toán</button> :
-          entry.checkoutUrl ? <a className="button primary" href={entry.checkoutUrl}><CreditCard size={18}/> Mở QR thanh toán</a> :
+          entry.checkoutUrl ? <a className="button primary" href={entry.checkoutUrl}><CreditCard size={18}/> Mở trang thanh toán payOS</a> :
             <button className="button primary" disabled={busy} onClick={() => pay('payment')}><CreditCard size={18}/>{busy ? 'Đang tạo QR…' : 'Tạo liên kết thanh toán'}</button>}
       </div>}
       {entry.status === 'confirmed' && <Link className="button primary" to="/lich-su">Xem lịch sử đặt sân</Link>}

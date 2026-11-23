@@ -3,8 +3,9 @@ import assert from 'node:assert/strict';
 import { test, before, after } from 'node:test';
 import { PayOS } from '@payos/node';
 import { createApp } from '../src/index.js';
-import { dateAt, now, recordPayment } from '../src/domain.js';
+import { bookingSelect, dateAt, now, recordPayment, showBooking } from '../src/domain.js';
 import { createDatabase, demoHourlyPrice, syncDirectory, syncDirectoryDetails, syncDirectoryPhotos } from '../src/db.js';
+import { createPayments } from '../src/payments.js';
 import { passwordHash, seedAdmin } from '../src/auth.js';
 
 let server, db, base;
@@ -291,6 +292,29 @@ test('payOS verifies its setup webhook while new bookings are still closed', asy
     await new Promise((resolve) => live.close(resolve));
     service.db.close();
   }
+});
+
+test('payOS QR payload is saved for the pending customer and hidden after confirmation', async () => {
+  const localDb = createDatabase(':memory:');
+  try {
+    syncDirectory(localDb);
+    localDb.prepare("INSERT INTO users(id,name,name_key,phone,email,password) VALUES (1,'Khách','khach','0911000000','qr@example.com','fixture')").run();
+    const hold = now() + 600;
+    localDb.prepare(`INSERT INTO bookings(id,user_id,court_id,starts,ends,amount,hold_until,code,provider)
+      VALUES ('qr-test',1,1,?,?,?,?,?,'payos')`).run(now()+86400,now()+90000,100000,hold,123456789);
+    const payload = '000201' + 'A'.repeat(30);
+    const client = { paymentRequests:{ create:async (data) => {
+      assert.equal(data.amount,100000);
+      return {paymentLinkId:'qr-link',checkoutUrl:'https://pay.payos.vn/web/qr-link',qrCode:payload};
+    } } };
+    const payments = createPayments(localDb,{origin:'https://example.com',paymentMode:'payos'},client);
+    const row = localDb.prepare(`${bookingSelect} WHERE b.id='qr-test'`).get();
+    const entry = await payments.start(row);
+    assert.equal(entry.qrPayload,payload);
+    assert.equal(localDb.prepare("SELECT qr_payload FROM bookings WHERE id='qr-test'").get().qr_payload,payload);
+    localDb.prepare("UPDATE bookings SET status='confirmed' WHERE id='qr-test'").run();
+    assert.equal(showBooking(localDb.prepare(`${bookingSelect} WHERE b.id='qr-test'`).get()).qrPayload,null);
+  } finally { localDb.close(); }
 });
 
 test('payOS webhook confirms only a signed matching payment and handles replays', async () => {

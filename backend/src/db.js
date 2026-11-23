@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS bookings (
   hold_until INTEGER NOT NULL, code INTEGER NOT NULL UNIQUE, created INTEGER NOT NULL DEFAULT (unixepoch()),
   status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending','confirmed','expired','review')),
   payment_status TEXT NOT NULL DEFAULT 'unpaid' CHECK(payment_status IN ('unpaid','paid','review')),
-  provider TEXT NOT NULL CHECK(provider IN ('demo','payos')), link_id TEXT, checkout TEXT
+  provider TEXT NOT NULL CHECK(provider IN ('demo','payos')), link_id TEXT, checkout TEXT, qr_payload TEXT
 );
 CREATE INDEX IF NOT EXISTS upcoming_court ON bookings(court_id, starts, ends, status);
 CREATE INDEX IF NOT EXISTS user_bookings ON bookings(user_id, created);
@@ -69,6 +69,9 @@ export function upgradeSchema(db) {
     }
     if (!db.prepare('PRAGMA table_info(courts)').all().some(({ name }) => name === 'is_demo')) {
       db.exec('ALTER TABLE courts ADD COLUMN is_demo INTEGER NOT NULL DEFAULT 0');
+    }
+    if (!db.prepare('PRAGMA table_info(bookings)').all().some(({ name }) => name === 'qr_payload')) {
+      db.exec('ALTER TABLE bookings ADD COLUMN qr_payload TEXT');
     }
   });
 }

@@ -414,7 +414,7 @@ export async function createApp(config, database) {
   manage.get('/bookings', (req, res) => {
     const rows = req.user.role === 'admin' ? db.prepare(`${bookingSelect} ORDER BY b.created DESC LIMIT 200`).all() :
       db.prepare(`${bookingSelect} WHERE v.owner_id=? ORDER BY b.created DESC LIMIT 200`).all(req.user.id);
-    res.json(rows.map((row) => showBooking({ ...row, checkout: null })));
+    res.json(rows.map((row) => showBooking({ ...row, checkout: null, qr_payload: null })));
   });
   // Use a dedicated router before the small JSON parser for image uploads.
   app.post('/upload-court-photo', protect, loadUser, requireManager, uploadLimit, json('3mb'), (req, res) => {

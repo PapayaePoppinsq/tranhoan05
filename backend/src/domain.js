@@ -90,7 +90,8 @@ export function showBooking(row) {
     address: row.address, date: slotDate(row.starts), time: slotTime(row.starts), end: slotTime(row.ends),
     amount: row.amount, expiresAt: row.hold_until, status, paymentStatus: row.payment_status,
     provider: row.provider, duration: (row.ends - row.starts) / 60, courtId: row.court_id,
-    checkoutUrl: status === 'pending' ? row.checkout : null };
+    checkoutUrl: status === 'pending' ? row.checkout : null,
+    qrPayload: status === 'pending' ? row.qr_payload || null : null };
 }
 
 export function reserve(db, userId, request, config) {

@@ -1,9 +1,9 @@
 import { PayOS } from '@payos/node';
 import { bookingSelect, HttpError, now, recordPayment, showBooking } from './domain.js';
 
-export function createPayments(db, config) {
+export function createPayments(db, config, providedClient) {
   // Keep webhook verification available while new bookings stay closed during setup.
-  const client = config.payos && Object.values(config.payos).every(Boolean) ? new PayOS(config.payos) : null;
+  const client = providedClient ?? (config.payos && Object.values(config.payos).every(Boolean) ? new PayOS(config.payos) : null);
   const inProgress = new Map();
 
   async function createLink(row) {
@@ -24,7 +24,10 @@ export function createPayments(db, config) {
     if (!link.paymentLinkId || url.protocol !== 'https:' || url.hostname !== 'pay.payos.vn') {
       throw new HttpError(502, 'Liên kết thanh toán không hợp lệ.');
     }
-    db.prepare('UPDATE bookings SET link_id=?, checkout=? WHERE id=?').run(link.paymentLinkId, url.href, row.id);
+    const qrPayload = typeof link.qrCode === 'string' && /^000201[\x20-\x7e]{14,1994}$/.test(link.qrCode)
+      ? link.qrCode : null;
+    db.prepare('UPDATE bookings SET link_id=?, checkout=?, qr_payload=? WHERE id=?')
+      .run(link.paymentLinkId, url.href, qrPayload, row.id);
   }
 
   return {

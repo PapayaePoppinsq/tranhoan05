@@ -75,6 +75,8 @@ Copy-Item .\backend\.env.example .\backend\.env
 
 Tìm thủ công, Đặt nhanh và Chatbot cùng đi qua **Xem lại đơn**. Backend tính lại giá và ghi giữ chỗ bằng giao dịch SQLite. Trigger trong cơ sở dữ liệu chặn các khoảng giờ chồng lấn trên một sân, kể cả khi hai yêu cầu tới cùng lúc. Giữ chỗ hết hạn sau tối đa 10 phút hoặc khi tới giờ bắt đầu. Với payOS, backend xác minh chữ ký, đối chiếu mã đơn, mã liên kết, tiền tệ và số tiền. Webhook lặp được xử lý một lần. Thanh toán đúng nhưng tới muộn chuyển sang đối soát.
 
+Sau khi khách xác nhận giữ chỗ, web tạo link payOS và hiển thị VietQR của chính đơn ngay trên trang thanh toán. Khách quét bằng app ngân hàng; trên cùng một điện thoại vẫn có nút mở trang payOS. QR chỉ hiện khi đơn còn chờ thanh toán. Tài khoản nhận tiền của chủ kênh vẫn phải liên kết với payOS để xác nhận tự động.
+
 ## Dữ liệu và ảnh
 
 `backend/data/thai-nguyen.csv` là file danh bạ duy nhất, lấy từ `danh_sach_25_san_pickleball_thai_nguyen_day_du-v2.csv`. File có 25 cụm sân và 107 sân nhỏ. Trang chi tiết hiển thị loại sân, mặt sân, bảng giá theo ngày và giờ, danh sách sân nhỏ và phụ phí nếu có. Với dòng ghi cả một khung giờ và “Mở cả ngày”, lịch dùng khung giờ cụ thể. “Mở cả ngày (24/24)” dùng 00:00–24:00.
