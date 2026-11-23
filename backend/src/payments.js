@@ -14,7 +14,7 @@ export function createPayments(db, config, providedClient) {
   const credentials = Object.fromEntries(Object.entries(config.payos || {})
     .map(([key, value]) => [key, typeof value === 'string' ? value.trim() : value]));
   const client = providedClient ?? (config.payos && Object.values(credentials).every(Boolean)
-    ? new PayOS(credentials) : null);
+    ? new PayOS({ ...credentials, fetch: (url, options) => fetch(url, options) }) : null);
   const inProgress = new Map();
 
   async function createLink(row) {
