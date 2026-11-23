@@ -2,7 +2,8 @@ import { PayOS } from '@payos/node';
 import { bookingSelect, HttpError, now, recordPayment, showBooking } from './domain.js';
 
 export function createPayments(db, config) {
-  const client = config.paymentMode === 'payos' ? new PayOS(config.payos) : null;
+  // Keep webhook verification available while new bookings stay closed during setup.
+  const client = config.payos && Object.values(config.payos).every(Boolean) ? new PayOS(config.payos) : null;
   const inProgress = new Map();
 
   async function createLink(row) {

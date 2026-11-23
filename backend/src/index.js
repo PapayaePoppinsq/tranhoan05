@@ -19,6 +19,9 @@ export function configuration() {
   if (env.DEMO_MODE !== undefined && !['true', 'false'].includes(env.DEMO_MODE)) {
     throw new Error('DEMO_MODE must be true or false.');
   }
+  if (env.PAYOS_WEBHOOK_READY !== undefined && !['true', 'false'].includes(env.PAYOS_WEBHOOK_READY)) {
+    throw new Error('PAYOS_WEBHOOK_READY must be true or false.');
+  }
   const demo = env.DEMO_MODE === 'true' || (env.DEMO_MODE === undefined && process.argv.includes('--demo'));
   const payos = { clientId: env.PAYOS_CLIENT_ID, apiKey: env.PAYOS_API_KEY, checksumKey: env.PAYOS_CHECKSUM_KEY };
   const port = Number(env.PORT || 4311);
@@ -33,7 +36,7 @@ export function configuration() {
   const origin = publicUrl.origin;
   return { port, origin, demo, payos, secure: origin.startsWith('https:'),
     database: env.DB_PATH || path(demo ? '../var/demo.sqlite' : '../var/live.sqlite'),
-    paymentMode: demo ? 'demo' : Object.values(payos).every(Boolean) ? 'payos' : 'off',
+    paymentMode: demo ? 'demo' : Object.values(payos).every(Boolean) && env.PAYOS_WEBHOOK_READY === 'true' ? 'payos' : 'off',
     adminPassword: env.ADMIN_PASSWORD, geminiKey: env.GEMINI_API_KEY, geminiModel: env.GEMINI_MODEL, orsKey: env.ORS_API_KEY };
 }
 

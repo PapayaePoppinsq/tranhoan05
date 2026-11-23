@@ -47,7 +47,14 @@ Thư mục `worker/` đóng gói API Express trong một Worker và dùng một 
 3. Trong dự án Pages `tranhoan05`, đặt biến môi trường production `BACKEND_ORIGIN` bằng gốc HTTPS của Worker, không có `/api` ở cuối. Redeploy Pages từ nhánh `main` để hàm proxy đọc biến mới.
 4. Đặt secret `ADMIN_PASSWORD` riêng cho Worker bằng `wrangler secret put ADMIN_PASSWORD --config worker/wrangler.jsonc`, rồi chạy `wrangler deploy --config worker/wrangler.jsonc --durable-objects-code-update-mode immediate` để Durable Object nhận cấu hình mới ngay. Không ghi mật khẩu vào Git. Số đăng nhập quản trị là `0900000000`.
 
-CSV có bảng giá và danh sách sân nhỏ tham khảo. Quản trị viên cần đối chiếu với chủ sân rồi nhập thông tin vận hành trước khi mở đặt. Khi chưa có đủ khóa payOS, API trả `payment: "off"` và giao diện không cho chốt đơn; chỉ bật thanh toán sau khi kiểm tra tài khoản nhận tiền, webhook và thông tin sân. `PUBLIC_ORIGIN` trong `worker/wrangler.jsonc` phải trùng chính xác miền Pages đang dùng.
+CSV có bảng giá và danh sách sân nhỏ tham khảo. Quản trị viên cần đối chiếu với chủ sân rồi nhập thông tin vận hành trước khi mở đặt. API trả `payment: "off"` và giao diện không cho chốt đơn cho đến khi có đủ khóa payOS **và** `PAYOS_WEBHOOK_READY=true`; webhook vẫn nhận được dữ liệu mẫu có chữ ký trong lúc cấu hình. `PUBLIC_ORIGIN` trong `worker/wrangler.jsonc` phải trùng chính xác miền Pages đang dùng.
+
+### Bật payOS cho Sân Pick
+
+1. Nếu khóa từng hiện trong ảnh chụp màn hình hoặc chat, tạo lại API Key và Checksum Key trong payOS, hoặc tạo kênh mới; bảo đảm khóa cũ không còn hiệu lực. Không nhập khóa vào Git, frontend hay `wrangler.jsonc`.
+2. Vào Cloudflare **Workers & Pages → `sanvot-booking-api` → Settings → Variables and Secrets**. Thêm ba mục loại **Secret**: `PAYOS_CLIENT_ID`, `PAYOS_API_KEY`, `PAYOS_CHECKSUM_KEY`, với giá trị mới lấy từ cùng một kênh payOS. Sau khi lưu, deploy Worker bằng `npx wrangler deploy --config worker/wrangler.jsonc --durable-objects-code-update-mode immediate`. Giữ `PAYOS_WEBHOOK_READY` là `false` ở bước này.
+3. Trong kênh payOS, đăng ký và xác nhận webhook `https://tranhoan05.pages.dev/api/payments/payos/webhook`. payOS gửi dữ liệu mẫu có chữ ký; backend trả 200 khi xác minh được. Nếu không qua được, kiểm tra ba secret, `BACKEND_ORIGIN` của Pages và route `/api`.
+4. Kiểm tra tài khoản nhận tiền, giá và sân đã xác minh. Sau đó đổi `PAYOS_WEBHOOK_READY` thành `true` trong `worker/wrangler.jsonc`, deploy Worker và kiểm tra `https://tranhoan05.pages.dev/api/config` trả `"payment":"payos"`. Dùng một giao dịch nhỏ để kiểm tra cả checkout, webhook và đơn được xác nhận. payOS dùng môi trường giao dịch thật cho bước này.
 
 ## Cấu hình dịch vụ ngoài
 
@@ -60,7 +67,7 @@ Copy-Item .\backend\.env.example .\backend\.env
 | `GEMINI_API_KEY`, `GEMINI_MODEL` | Chỉ dùng cho backend chạy Node.js ngoài Cloudflare. Trên Worker, binding Workers AI được ưu tiên và không cần khóa Gemini. Dùng tên model Gemini hỗ trợ JSON theo [tài liệu Gemini](https://ai.google.dev/gemini-api/docs/structured-output). Khi dịch vụ AI gián đoạn, chatbot chuyển sang quy tắc. |
 | `ORS_API_KEY` | Hiện quãng đường lái xe và vẽ tuyến với [openrouteservice](https://openrouteservice.org/). Khi thiếu khóa hoặc API gián đoạn, danh sách ghi khoảng cách đường chim bay và trang sân có nút mở chỉ đường ngoài. [Máy chủ bản đồ OpenStreetMap](https://operations.osmfoundation.org/policies/tiles/) có chính sách sử dụng riêng. |
 | `DEMO_MODE=false`, `ADMIN_PASSWORD` | Chuyển sang cơ sở dữ liệu riêng cho vận hành. Đặt mật khẩu quản trị từ 12 ký tự khi khởi tạo. Chỉ sân đã được quản trị viên xác minh mới có thể nhận đặt. |
-| `PUBLIC_ORIGIN`, `PAYOS_CLIENT_ID`, `PAYOS_API_KEY`, `PAYOS_CHECKSUM_KEY` | Đặt địa chỉ HTTPS thật của website và khóa từ kênh [payOS](https://payos.vn/docs/sdks/back-end/node/). Trỏ webhook về `<PUBLIC_ORIGIN>/api/payments/payos/webhook`. Bản triển khai sử dụng một kênh nhận tiền cho nền tảng. |
+| `PUBLIC_ORIGIN`, `PAYOS_CLIENT_ID`, `PAYOS_API_KEY`, `PAYOS_CHECKSUM_KEY`, `PAYOS_WEBHOOK_READY` | Đặt địa chỉ HTTPS thật của website và ba khóa từ cùng kênh [payOS](https://payos.vn/docs/sdks/back-end/node/). Trỏ webhook về `<PUBLIC_ORIGIN>/api/payments/payos/webhook`, rồi mới đặt `PAYOS_WEBHOOK_READY=true` để mở đặt sân. Bản triển khai sử dụng một kênh nhận tiền cho nền tảng. |
 
 Để dùng bên ngoài máy phát triển, chạy build và API sau máy chủ HTTPS, đặt `PUBLIC_ORIGIN` trùng với tên miền và dùng ổ đĩa lưu trữ bền vững cho SQLite. Các kết nối AI, định tuyến và payOS phụ thuộc vào gói của tài khoản. Kiểm tra phí và hạn mức với nhà cung cấp trước khi bật. Khóa dịch vụ nằm trong `.env` backend.
 

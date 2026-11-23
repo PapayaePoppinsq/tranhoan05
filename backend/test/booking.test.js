@@ -269,6 +269,30 @@ test('limits pending holds per account and lets the holder retry an existing ord
   assert.equal((await request('/bookings', { cookie: user.cookie, body: { ...booking, time: '18:00' } })).status, 201);
 });
 
+test('payOS verifies its setup webhook while new bookings are still closed', async () => {
+  const payos = {clientId:'fixture', apiKey:'fixture', checksumKey:'checksum-fixture-setup'};
+  const service = await createApp({demo:false,paymentMode:'off',payos,database:':memory:',origin:'http://localhost:5173'});
+  const live = service.app.listen(0,'127.0.0.1');
+  await once(live,'listening');
+  const endpoint = `http://127.0.0.1:${live.address().port}/api`;
+  try {
+    const config = await (await fetch(endpoint + '/config')).json();
+    assert.equal(config.payment,'off');
+    const data = {orderCode:123456,amount:2000,description:'VQRTEST',accountNumber:'1234',
+      reference:'sample',transactionDateTime:'2026-11-23 00:00:00',currency:'VND',
+      paymentLinkId:'sample-link',code:'00',desc:'success'};
+    const sdk = new PayOS(payos);
+    const signature = await sdk.crypto.createSignatureFromObj(data,payos.checksumKey);
+    const response = await fetch(endpoint + '/payments/payos/webhook',{method:'POST',
+      headers:{'Content-Type':'application/json'},body:JSON.stringify({code:'00',desc:'success',success:true,data,signature})});
+    assert.equal(response.status,200);
+    assert.equal(service.db.prepare('SELECT count(*) AS total FROM payment_events').get().total,0);
+  } finally {
+    await new Promise((resolve) => live.close(resolve));
+    service.db.close();
+  }
+});
+
 test('payOS webhook confirms only a signed matching payment and handles replays', async () => {
   const payos = {clientId:'fixture', apiKey:'fixture', checksumKey:'checksum-fixture-webhook'};
   const service = await createApp({demo:false,paymentMode:'payos',payos,database:':memory:',origin:'http://localhost:5173'});

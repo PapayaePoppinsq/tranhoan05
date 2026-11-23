@@ -4,7 +4,8 @@
   "main": "src/index.js",
   "compatibility_date": "2026-10-26",
   "vars": {
-    "PUBLIC_ORIGIN": "https://tranhoan05.pages.dev"
+    "PUBLIC_ORIGIN": "https://tranhoan05.pages.dev",
+    "PAYOS_WEBHOOK_READY": "false"
   },
   "ai": { "binding": "AI" },
   "durable_objects": {

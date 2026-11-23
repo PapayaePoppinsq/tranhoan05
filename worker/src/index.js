@@ -40,7 +40,7 @@ export class BookingDatabase extends DurableObject {
       const payos = { clientId:env.PAYOS_CLIENT_ID, apiKey:env.PAYOS_API_KEY,
         checksumKey:env.PAYOS_CHECKSUM_KEY };
       const config = { origin, secure:true, demo:false, port:4311, payos,
-        paymentMode:Object.values(payos).every(Boolean) ? 'payos' : 'off',
+        paymentMode:Object.values(payos).every(Boolean) && env.PAYOS_WEBHOOK_READY === 'true' ? 'payos' : 'off',
         adminPassword:env.ADMIN_PASSWORD?.trim(), geminiKey:env.GEMINI_API_KEY,
         geminiModel:env.GEMINI_MODEL, ai:env.AI, orsKey:env.ORS_API_KEY };
       this.db = db;
