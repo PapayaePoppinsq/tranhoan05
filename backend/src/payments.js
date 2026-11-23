@@ -11,7 +11,10 @@ function payosFailure(error) {
 
 export function createPayments(db, config, providedClient) {
   // Keep webhook verification available while new bookings stay closed during setup.
-  const client = providedClient ?? (config.payos && Object.values(config.payos).every(Boolean) ? new PayOS(config.payos) : null);
+  const credentials = Object.fromEntries(Object.entries(config.payos || {})
+    .map(([key, value]) => [key, typeof value === 'string' ? value.trim() : value]));
+  const client = providedClient ?? (config.payos && Object.values(credentials).every(Boolean)
+    ? new PayOS(credentials) : null);
   const inProgress = new Map();
 
   async function createLink(row) {
