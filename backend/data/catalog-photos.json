@@ -83,9 +83,10 @@
     "id": 11,
     "name": "Pickleball Bắc Sơn Club",
     "address": "Số 1 Ngõ 100 Hoàng Văn Thụ, Phường Hoàng Văn Thụ, TP. Thái Nguyên",
-    "cover": null,
-    "source": null,
-    "note": "CSV có ảnh phối cảnh và ảnh trùng nguồn với H83. Trang Sportnet ghi địa chỉ Lô 3 đường Bắc Sơn, khác địa chỉ trong CSV."
+    "cover": "/images/san-thuc-te/11-c32cb4c47750.jpg",
+    "source": "https://shopvnb.com/san-pickleball-tinh-thai-nguyen.html",
+    "imageUrl": "https://cdn.shopvnb.com/uploads/images/bai_viet/san-pickleball-tinh-thai-nguyen-15-1762549951.jpg",
+    "note": "Ảnh tại mục Bắc Sơn Club của bài viết ghi đúng địa chỉ ngõ 100 Hoàng Văn Thụ; ảnh CSV cũ bị nhầm nguồn."
   },
   {
     "id": 12,
@@ -195,8 +196,9 @@
     "id": 25,
     "name": "Sân Pickleball Hoàng Gia",
     "address": "Đường Z115, Phường Tân Thịnh, TP. Thái Nguyên",
-    "cover": null,
-    "source": null,
-    "note": "Ảnh Sportnet cùng tên thuộc sân ở Thanh Hóa. Ảnh phụ từ Pickdee chưa có thông tin để đối chiếu địa chỉ."
+    "cover": "/images/san-thuc-te/25-c0ebef5b490c.webp",
+    "source": "https://tuanviet.vn/danh-sach-san-pickleball-tinh-thai-nguyen",
+    "imageUrl": "https://media.tuanviet.vn/media/mon-the-thao/san-pickleball/thai-nguyen/thai-nguyen/phuong-phan-dinh-phung/san-pickleball-hoang-gia/san-pickleball-hoang-gia-1.webp",
+    "note": "Ảnh tại mục Hoàng Gia của bài viết ghi địa chỉ đầu đường Z115; không dùng ảnh Sportnet ở Thanh Hóa."
   }
 ]

@@ -183,14 +183,15 @@ export function syncDirectoryDetails(db, rows) {
   });
 }
 
-export function syncDirectoryPhotos(db) {
-  const manifest = readFileSync(new URL('../data/catalog-photos.json', import.meta.url), 'utf8');
+export function syncDirectoryPhotos(db, suppliedPhotos, suppliedCatalog) {
+  const manifest = suppliedPhotos ? JSON.stringify(suppliedPhotos) :
+    readFileSync(new URL('../data/catalog-photos.json', import.meta.url), 'utf8');
   const version = createHash('sha256').update(manifest).digest('hex');
   const importedVersion = db.prepare("SELECT value FROM app_data WHERE key='directory_photos'");
   if (importedVersion.get()?.value === version) return;
 
   const photos = JSON.parse(manifest);
-  const catalog = new Map(readDirectory().map((row) => [row.id, row]));
+  const catalog = new Map((suppliedCatalog || readDirectory()).map((row) => [row.id, row]));
   const seen = new Set(), covers = new Set();
   for (const row of photos) {
     const venue = catalog.get(row.id);

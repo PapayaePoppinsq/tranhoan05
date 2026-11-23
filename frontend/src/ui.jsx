@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { CalendarDays, Clock3, Heart, ImageOff, MapPin, Navigation, ShieldCheck, Sparkles, Star, X } from 'lucide-react';
+import { CalendarDays, Clock3, Heart, MapPin, Navigation, ShieldCheck, Sparkles, Star, X } from 'lucide-react';
 import { detailsUrl, longDate, money, reviewUrl, today } from './api';
 
 export function Brand() {
@@ -23,7 +23,15 @@ export function Dialog({ title, icon, onClose, children, className = '' }) {
 
 export function VenuePicture({ venue }) {
   const [failed, setFailed] = useState(null);
-  if (!venue.image || failed === venue.image) return <div className="venue-photo-missing"><ImageOff size={24}/><span>{venue.directory_id ? 'Chưa có ảnh xác minh' : 'Ảnh chưa có'}</span></div>;
+  if (!venue.image || failed === venue.image) return <div className="venue-photo-missing" role="img" aria-label={`Chưa có ảnh chụp của ${venue.name}`}>
+    <svg className="venue-court-graphic" viewBox="0 0 360 180" aria-hidden="true" focusable="false">
+      <rect x="20" y="14" width="320" height="152" rx="5" fill="#c6dfc5"/>
+      <rect x="34" y="28" width="292" height="124" fill="none" stroke="#f9fcf7" strokeWidth="4"/>
+      <path d="M110 28v124m140-124v124M34 90h292M180 28v62" fill="none" stroke="#f9fcf7" strokeWidth="4"/>
+      <path d="M180 20v140" fill="none" stroke="#356847" strokeWidth="5" strokeDasharray="4 5"/>
+    </svg>
+    <span>Chưa có ảnh chụp sân</span>
+  </div>;
   return <img loading="lazy" src={venue.image} alt={venue.image_sample ? 'Ảnh minh họa' : `Ảnh danh bạ ${venue.name}`}
     onError={() => setFailed(venue.image)} />;
 }

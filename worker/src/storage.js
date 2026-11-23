@@ -1,5 +1,6 @@
-import { schemaSql, syncDirectoryDetails, upgradeSchema } from '../../backend/src/db.js';
+import { schemaSql, syncDirectoryDetails, syncDirectoryPhotos, upgradeSchema } from '../../backend/src/db.js';
 import catalog from '../../frontend/public/catalog.json' with { type: 'json' };
+import photos from '../../backend/data/catalog-photos.json' with { type: 'json' };
 
 export function databaseFor(ctx) {
   const sql = ctx.storage.sql;
@@ -25,6 +26,7 @@ export function initializeDatabase(db) {
   upgradeSchema(db);
   seedCatalog(db);
   syncDirectoryDetails(db, catalog);
+  syncDirectoryPhotos(db, photos, catalog);
 }
 
 function seedCatalog(db) {

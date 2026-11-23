@@ -1,5 +1,6 @@
 import { once } from 'node:events';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { test, before, after } from 'node:test';
 import { PayOS } from '@payos/node';
 import { createApp } from '../src/index.js';
@@ -34,7 +35,7 @@ const signUp = (n, name = `Khách ${n}`) => request('/auth/register', { body:{ n
 test('imports 25 venue records with operating hours, ratings and supplied images', async () => {
   const { body:venues } = await request('/venues');
   assert.equal(venues.length, 25);
-  assert.equal(venues.filter((venue) => venue.image).length,16);
+  assert.equal(venues.filter((venue) => venue.image).length,18);
   assert.equal(venues[0].name,'Sân Vin Pickleball Thanh Niên 2');
   assert.equal(venues[0].lat,21.5794);
   assert.equal(venues[0].rating,5);
@@ -44,9 +45,10 @@ test('imports 25 venue records with operating hours, ratings and supplied images
   assert.equal(venues.reduce((count, venue) => count + venue.directory_details.courtCount, 0), 107);
   assert.equal(venues[1].image,'');
   assert.match(venues[6].image,/\/san-thuc-te\/7-/);
+  assert.match(venues[10].image,/\/san-thuc-te\/11-/);
   assert.match(venues[7].photo_source,/bvdktuthainguyen.gov.vn/);
   assert.equal(venues[18].image,'');
-  assert.equal(venues[24].image,'');
+  assert.match(venues[24].image,/\/san-thuc-te\/25-/);
   assert.ok(venues.every((v) => Number.isFinite(v.lat) && Number.isFinite(v.lng) && v.map_url.startsWith('https://')));
   assert.deepEqual(venues.slice(4,6).map(({open,close}) => [open,close]), [['05:00','23:00'],['00:00','24:00']]);
   const allDay = (await request(`/venues/6/availability?date=${dateAt(1)}&duration=60`)).body[0];
@@ -156,6 +158,12 @@ test('replaces old directory without reusing booking identifiers or re-importing
     existing.prepare("UPDATE venues SET image='/api/media/user-upload' WHERE directory_id=3").run();
     syncDirectoryPhotos(existing);
     assert.match(existing.prepare('SELECT image FROM venues WHERE id=?').get(row.id).image,/\/san-thuc-te\/1-/);
+    assert.equal(existing.prepare('SELECT image FROM venues WHERE directory_id=3').get().image,'/api/media/user-upload');
+    existing.prepare("UPDATE venues SET image='' WHERE directory_id=11").run();
+    const photos = JSON.parse(readFileSync(new URL('../data/catalog-photos.json', import.meta.url), 'utf8'));
+    const catalog = JSON.parse(readFileSync(new URL('../../frontend/public/catalog.json', import.meta.url), 'utf8'));
+    syncDirectoryPhotos(existing, photos, catalog);
+    assert.match(existing.prepare('SELECT image FROM venues WHERE directory_id=11').get().image,/\/san-thuc-te\/11-/);
     assert.equal(existing.prepare('SELECT image FROM venues WHERE directory_id=3').get().image,'/api/media/user-upload');
     assert.equal(existing.prepare('SELECT court_id FROM bookings WHERE id=?').get('legacy').court_id,1);
   } finally { existing.close(); }
