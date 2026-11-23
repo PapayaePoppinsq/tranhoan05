@@ -94,8 +94,10 @@ export async function naturalReply(config, { message, history, criteria, facts, 
     if (!reply || reply.length > 500 || /<[^>]+>/.test(reply) ||
       criteria.date && /ngày (?:nào|cụ thể|mấy)|cho .{0,30}ngày chơi/i.test(reply) ||
       intent === 'booking' && criteria.date && facts.bookableVenueCount === 0 && !/(chưa|không)/i.test(reply) ||
-      intent === 'social' && /\b20\d{2}\b|\bthứ [2-7]\b|chủ nhật/i.test(reply) ||
+      intent === 'social' && /\b20\d{2}\b|thứ\s+(?:hai|ba|tư|bốn|năm|sáu|bảy|[2-7])|chủ nhật|ngày\s+\d{1,2}\s+tháng/i.test(reply) ||
       /(?:cho|gửi|cung cấp).{0,30}địa chỉ nhà/i.test(reply) ||
+      intent === 'help' && /\b(gan nha|gan toi|gan minh|gan day)\b/.test(textKey(message)) &&
+        /(?:nhập|cho|gửi).{0,30}địa chỉ/i.test(reply) ||
       facts.originProvided === false && /gần (?:bạn|nhà bạn|vị trí của bạn)|cách bạn \d/i.test(reply) ||
       !facts.results.length && /đã đặt|đặt thành công|còn giờ trống|còn sân trống/i.test(reply)) {
       throw new Error('Invalid model reply');

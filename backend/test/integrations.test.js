@@ -86,3 +86,13 @@ test('social reply cannot invent the current calendar date', async () => {
     criteria:{}, facts:{ results:[], paymentReady:false }, fallback:'Chào bạn!', intent:'social' });
   assert.deepEqual(result, { reply:'Chào bạn!', mode:'fallback' });
 });
+
+test('social reply cannot invent a weekday and nearby help avoids requesting a home address', async () => {
+  const weekday = await naturalReply({ ai:{ async run() { return { response:'Hôm nay là thứ Sáu vui vẻ!' }; } } },
+    { message:'Chào bạn', history:[], criteria:{}, facts:{ results:[] }, fallback:'Chào bạn!', intent:'social' });
+  assert.equal(weekday.mode, 'fallback');
+  const address = await naturalReply({ ai:{ async run() { return { response:'Bạn nhập địa chỉ để mình tìm sân gần nhất.' }; } } },
+    { message:'Tôi tìm sân gần nhà thế nào?', history:[], criteria:{}, facts:{ results:[] },
+      fallback:'Bấm Chọn vị trí trong khung chat.', intent:'help' });
+  assert.equal(address.reply, 'Bấm Chọn vị trí trong khung chat.');
+});
