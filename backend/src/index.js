@@ -216,8 +216,15 @@ export async function createApp(config, database) {
     const { criteria, mode } = await interpret(config, message, areas);
     const combined = { ...context, ...criteria };
     const startingArea = combined.area || Boolean(origin);
+    const matchingVenues = combined.area ? venues.filter((venue) =>
+      textKey(`${venue.area} ${venue.name} ${venue.address}`).includes(textKey(combined.area))) : venues;
     let reply, results = [];
-    if (!combined.date) reply = 'Bạn muốn chơi hôm nay hay ngày nào?';
+    if (!combined.date) {
+      const directoryQuestion = /\b(co nhung san nao|co san nao|nhung san nao|danh sach san)\b/.test(textKey(message));
+      reply = directoryQuestion && combined.area ? matchingVenues.length ?
+        `Danh bạ ghi ${matchingVenues.length} cụm sân ở ${combined.area}, ${matchingVenues.length > 4 ? 'ví dụ' : 'gồm'} ${matchingVenues.slice(0, 4).map((venue) => venue.name).join(', ')}. Thông tin chưa được chủ sân xác minh.` :
+        `Danh bạ chưa ghi nhận cụm sân ở ${combined.area}.` : 'Bạn muốn chơi hôm nay hay ngày nào?';
+    }
     else if (!validDate(combined.date)) {
       delete combined.date;
       reply = 'Chọn ngày hợp lệ từ hôm nay đến 30 ngày tới.';
@@ -231,8 +238,6 @@ export async function createApp(config, database) {
           'Hiện chưa có sân nào được xác minh và mở nhận đặt. Bạn có thể xem thông tin các cụm sân ở trang tìm sân.' :
           'Chưa có sân phù hợp với các điều kiện này. Thử chọn giờ, khu vực hoặc mức giá khác.';
     }
-    const matchingVenues = combined.area ? venues.filter((venue) =>
-      textKey(`${venue.area} ${venue.name} ${venue.address}`).includes(textKey(combined.area))) : venues;
     const facts = { venueCount:venues.length, bookableVenueCount:venues.filter((venue) => venue.verified && venue.court_count).length,
       venueSamples:matchingVenues.slice(0, 4).map((venue) => ({ name:venue.name, area:venue.area,
         directoryHours:`${venue.open}-${venue.close}`, verifiedForBooking:Boolean(venue.verified && venue.court_count) })),

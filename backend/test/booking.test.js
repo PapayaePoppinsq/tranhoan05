@@ -51,6 +51,13 @@ test('imports 25 venue records with operating hours, ratings and supplied images
   assert.equal(allDay.slots.at(-1).end,'24:00');
 });
 
+test('directory questions list real venues without inventing a playing date', async () => {
+  const { body } = await request('/chat', { body:{ message:'Ở Quyết Thắng có những sân nào?' } });
+  assert.equal(body.mode, 'demo');
+  assert.equal(body.criteria.date, undefined);
+  assert.match(body.reply, /CLB Pickleball Quyết Thắng/);
+});
+
 test('replaces old directory without reusing booking identifiers or re-importing on restart', () => {
   const existing = createDatabase(':memory:');
   try {

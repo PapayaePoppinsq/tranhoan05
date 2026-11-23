@@ -5,7 +5,7 @@ import { interpret, naturalReply } from '../src/integrations.js';
 test('Workers AI extracts Vietnamese search criteria without controlling booking data', async () => {
   let prompt;
   const ai = { async run(model, input) {
-    assert.equal(model, '@cf/google/gemma-4-26b-a4b-it');
+    assert.equal(model, '@cf/zai-org/glm-4.7-flash');
     prompt = input.messages;
     return { response:'{"date":"2026-11-24","after":"19:00","maxPrice":199999,"near":true}' };
   } };
@@ -22,6 +22,21 @@ test('invalid model output falls back to local rules', async () => {
   assert.equal(result.mode, 'fallback');
   assert.equal(result.criteria.after, '19:00');
   assert.equal(result.criteria.maxPrice, 199999);
+});
+
+test('model cannot invent a date for a directory question', async () => {
+  const ai = { async run() { return { choices:[{ message:{ content:'{"date":"2026-11-23","area":"Quyết Thắng"}' } }] }; } };
+  const result = await interpret({ ai }, 'Ở Quyết Thắng có những sân nào?', ['Quyết Thắng']);
+  assert.equal(result.mode, 'ai');
+  assert.deepEqual(result.criteria, { area:'Quyết Thắng' });
+});
+
+test('explicit price and hour in Vietnamese override inaccurate model numbers', async () => {
+  const ai = { async run() { return { response:'{"date":"2026-11-24","after":"19:00","maxPrice":199000}' }; } };
+  const result = await interpret({ ai }, 'Tìm sân tối mai sau 7 giờ, dưới 200 nghìn', []);
+  assert.equal(result.mode, 'ai');
+  assert.equal(result.criteria.maxPrice, 199999);
+  assert.equal(result.criteria.after, '19:00');
 });
 
 test('natural response uses checked facts and short conversation history', async () => {
