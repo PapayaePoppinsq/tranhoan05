@@ -4,7 +4,7 @@ import { CalendarDays, Clock3, Heart, ImageOff, MapPin, Navigation, ShieldCheck,
 import { detailsUrl, longDate, money, reviewUrl, today } from './api';
 
 export function Brand() {
-  return <Link to="/" className="brand"><img src="/icon.svg" alt="" width="38" height="38"/><span>Sân<span>Vợt</span></span></Link>;
+  return <Link to="/" className="brand"><img src="/icon.svg" alt="" width="38" height="38"/><span>Sân<span>Pick</span></span></Link>;
 }
 export function Alert({ children }) { return children ? <p className="alert" role="alert">{children}</p> : null; }
 export function Loading({ children = 'Đang tải…' }) { return <div className="placeholder" role="status">{children}</div>; }
