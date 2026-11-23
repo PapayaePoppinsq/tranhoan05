@@ -77,7 +77,7 @@ function ChatDialog({ onClose }) {
     finally { setBusy(false); }
   }
   return <Dialog title="Trợ lý tìm sân" icon={<Sparkles size={22}/>} onClose={onClose} className="chat-dialog">
-    <div className="chat-tools"><span>{mode === 'ai' ? 'Chatbot AI' : mode === 'fallback' ? 'AI gián đoạn · đang dùng quy tắc' : 'Chế độ thử · tìm bằng quy tắc'}</span>
+    <div className="chat-tools"><span>{mode === 'ai' ? 'Chatbot chữ' : mode === 'fallback' ? 'AI gián đoạn · đang dùng quy tắc' : 'Chế độ thử · tìm bằng quy tắc'}</span>
       <button className="text-button" onClick={() => setOverlay('position')}>Chọn vị trí</button>
       {log.length > 0 && <button className="text-button" disabled={busy} onClick={() => {setContext(null);setLog([]);}}>Hỏi mới</button>}</div>
     <div className="chat-log" ref={scroll} aria-live="polite"><p className="chat-bubble">Chào bạn! Cứ nói bạn muốn chơi lúc nào, ở đâu hoặc hỏi mình về một cụm sân nhé.</p>

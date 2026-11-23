@@ -56,7 +56,7 @@ const jsonSchema = {
     duration: {type:'integer'}, area: {type:'string'}, maxPrice: {type:'integer'}, near: {type:'boolean'} },
 };
 
-const aiModel = '@cf/zai-org/glm-4.7-flash';
+const aiModel = '@cf/google/gemma-4-26b-a4b-it';
 
 function modelText(output) {
   const content = output?.response ?? output?.choices?.[0]?.message?.content;

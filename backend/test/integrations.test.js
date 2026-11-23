@@ -5,7 +5,7 @@ import { interpret, naturalReply } from '../src/integrations.js';
 test('Workers AI extracts Vietnamese search criteria without controlling booking data', async () => {
   let prompt;
   const ai = { async run(model, input) {
-    assert.equal(model, '@cf/zai-org/glm-4.7-flash');
+    assert.equal(model, '@cf/google/gemma-4-26b-a4b-it');
     prompt = input.messages;
     return { response:'{"date":"2026-11-24","after":"19:00","maxPrice":199999,"near":true}' };
   } };
@@ -50,7 +50,8 @@ test('first-person tôi does not become an evening time filter', async () => {
 
 test('natural response uses checked facts and short conversation history', async () => {
   let sent;
-  const ai = { async run(_model, input) {
+  const ai = { async run(model, input) {
+    assert.equal(model, '@cf/google/gemma-4-26b-a4b-it');
     sent = input.messages;
     return { choices:[{ message:{ content:'Mình chưa thấy sân nào mở nhận đặt lúc này. Bạn có thể xem trước danh sách địa điểm nhé.' } }] };
   } };
