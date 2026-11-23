@@ -1,4 +1,4 @@
-import { schemaSql, upgradeSchema } from '../../backend/src/db.js';
+import { schemaSql, syncDirectoryDetails, upgradeSchema } from '../../backend/src/db.js';
 import catalog from '../../frontend/public/catalog.json' with { type: 'json' };
 
 export function databaseFor(ctx) {
@@ -23,6 +23,11 @@ export function databaseFor(ctx) {
 export function initializeDatabase(db) {
   db.exec(schemaSql);
   upgradeSchema(db);
+  seedCatalog(db);
+  syncDirectoryDetails(db, catalog);
+}
+
+function seedCatalog(db) {
   if (db.prepare('SELECT id FROM venues LIMIT 1').get()) return;
   db.transactionSync(() => {
     const venue = db.prepare(`INSERT INTO venues

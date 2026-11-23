@@ -46,13 +46,15 @@ export function Home() {
   const venues = useMemo(() => (source.value ?? []).filter((venue) => {
     if (group === 'featured' && !venue.featured) return false;
     if (filter.area && venue.area !== filter.area) return false;
-    if (price && ((!site.config?.demo && !venue.verified) || venue.price > Number(price))) return false;
+    if (price && knownPrice(venue) > Number(price)) return false;
     return sameText(`${venue.name} ${venue.area} ${venue.address}`).includes(sameText(filter.query.trim()));
   }).sort((a,b) => sort === 'price' ? knownPrice(a) - knownPrice(b) : sort === 'near' ?
     (distance[a.id]?.km ?? Infinity) - (distance[b.id]?.km ?? Infinity) :
     Number(site.favorites.includes(b.id)) - Number(site.favorites.includes(a.id)) || b.featured - a.featured),
   [source.value, filter, sort, site.favorites, site.config?.demo, price, group, distance]);
-  function knownPrice(venue) { return site.config?.demo || venue.verified ? venue.price : Infinity; }
+  function knownPrice(venue) {
+    return site.config?.demo || venue.verified ? venue.price : venue.directory_details?.prices.offPeak ?? Infinity;
+  }
   const update = (key, value) => setDraft((old) => ({ ...old, [key]:value }));
   function search(event) {
     event.preventDefault(); setFilter(draft);

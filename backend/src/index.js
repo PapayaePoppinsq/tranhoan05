@@ -216,7 +216,15 @@ export async function createApp(config, database) {
     const { criteria, mode } = await interpret(config, message, areas);
     const combined = { ...context, ...criteria };
     const startingArea = combined.area || Boolean(origin);
-    const matchingVenues = combined.area ? venues.filter((venue) =>
+    const nameKey = (value) => textKey(value).replace(/[^a-z0-9]+/g, ' ').trim();
+    const query = ` ${nameKey(message)} `;
+    const namedVenues = venues.filter(({ name }) => {
+      const exactName = nameKey(name);
+      const shortName = nameKey(name.replace(/\([^)]*\)/g, ''))
+        .replace(/\b(?:san|pickleball|club|clb)\b/g, ' ').replace(/\s+/g, ' ').trim();
+      return query.includes(` ${exactName} `) || (shortName.length >= 3 && query.includes(` ${shortName} `));
+    });
+    const matchingVenues = namedVenues.length ? namedVenues : combined.area ? venues.filter((venue) =>
       textKey(`${venue.area} ${venue.name} ${venue.address}`).includes(textKey(combined.area))) : venues;
     let reply, results = [];
     if (!combined.date) {
@@ -224,6 +232,11 @@ export async function createApp(config, database) {
       reply = directoryQuestion && combined.area ? matchingVenues.length ?
         `Danh bạ ghi ${matchingVenues.length} cụm sân ở ${combined.area}, ${matchingVenues.length > 4 ? 'ví dụ' : 'gồm'} ${matchingVenues.slice(0, 4).map((venue) => venue.name).join(', ')}. Thông tin chưa được chủ sân xác minh.` :
         `Danh bạ chưa ghi nhận cụm sân ở ${combined.area}.` : 'Bạn muốn chơi hôm nay hay ngày nào?';
+      const venue = namedVenues.length === 1 ? namedVenues[0] : null;
+      if (venue?.directory_details && /\b(gia|bao nhieu san|mat san|mai che|trong nha|ngoai troi)\b/.test(textKey(message))) {
+        const { courtCount, courtType, surface, prices } = venue.directory_details;
+        reply = `${venue.name} có ${courtCount} sân nhỏ, loại sân ${courtType.toLowerCase()}, mặt sân ${surface}. Giá thấp điểm tham khảo ${prices.offPeak.toLocaleString('vi-VN')} ₫/giờ. Xem trang chi tiết để tra bảng giá và phụ phí theo khung giờ.`;
+      }
     }
     else if (!validDate(combined.date)) {
       delete combined.date;
@@ -232,7 +245,8 @@ export async function createApp(config, database) {
     else if (combined.near && !startingArea) reply = 'Bạn muốn tìm gần khu vực nào? Bạn cũng có thể dùng vị trí hiện tại.';
     else if (combined.after && combined.before && combined.after >= combined.before) reply = 'Giờ bắt đầu cần sớm hơn giờ kết thúc. Bạn muốn tìm khung nào?';
     else {
-      results = suggest(db, { ...combined, origin }, req.user, config.demo);
+      const venueId = namedVenues.length === 1 ? namedVenues[0].id : undefined;
+      results = suggest(db, { ...combined, origin, venueId }, req.user, config.demo);
       reply = results.length ? `Mình tìm được ${results.length} khung giờ phù hợp, mặc định ${combined.duration ?? 60} phút. Chọn một khung để xem lại đơn.` :
         !config.demo && venues.every((venue) => !venue.verified || !venue.court_count) ?
           'Hiện chưa có sân nào được xác minh và mở nhận đặt. Bạn có thể xem thông tin các cụm sân ở trang tìm sân.' :
@@ -240,7 +254,8 @@ export async function createApp(config, database) {
     }
     const facts = { venueCount:venues.length, bookableVenueCount:venues.filter((venue) => venue.verified && venue.court_count).length,
       venueSamples:matchingVenues.slice(0, 4).map((venue) => ({ name:venue.name, area:venue.area,
-        directoryHours:`${venue.open}-${venue.close}`, verifiedForBooking:Boolean(venue.verified && venue.court_count) })),
+        directoryHours:`${venue.open}-${venue.close}`, verifiedForBooking:Boolean(venue.verified && venue.court_count),
+        directoryReference:venue.directory_details })),
       results:results.map(({ venueName, area, date, time, end, amount, reason }) =>
         ({ venueName, area, date, time, end, amount, reason })) };
     const response = config.ai ? await naturalReply(config, { message, history, criteria:combined,

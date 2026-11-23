@@ -17,6 +17,71 @@
     "rating": 5,
     "rating_count": 4,
     "contact_phone": "0384 999 777",
+    "directory_details": {
+      "courtCount": 6,
+      "courtType": "Có mái che",
+      "surface": "Acrylic tiêu chuẩn thi đấu",
+      "prices": {
+        "offPeak": 100000,
+        "peak": 160000,
+        "weekend": 180000
+      },
+      "weekdayRates": [
+        {
+          "start": "06:00",
+          "end": "08:00",
+          "hourly": 120000
+        },
+        {
+          "start": "08:00",
+          "end": "16:00",
+          "hourly": 100000
+        },
+        {
+          "start": "16:00",
+          "end": "22:00",
+          "hourly": 160000
+        }
+      ],
+      "weekendRates": [
+        {
+          "start": "06:00",
+          "end": "16:00",
+          "hourly": 130000
+        },
+        {
+          "start": "16:00",
+          "end": "22:00",
+          "hourly": 180000
+        }
+      ],
+      "courts": [
+        {
+          "code": "TN01-S01",
+          "label": "Sân 1 (Có mái che)"
+        },
+        {
+          "code": "TN01-S02",
+          "label": "Sân 2 (Có mái che)"
+        },
+        {
+          "code": "TN01-S03",
+          "label": "Sân 3 (Có mái che)"
+        },
+        {
+          "code": "TN01-S04",
+          "label": "Sân 4 (Có mái che)"
+        },
+        {
+          "code": "TN01-S05",
+          "label": "Sân 5 (Có mái che)"
+        },
+        {
+          "code": "TN01-S06",
+          "label": "Sân 6 (Có mái che)"
+        }
+      ]
+    },
     "featured": 0,
     "verified": 0,
     "price": 100000,
@@ -41,6 +106,69 @@
     "rating": 5,
     "rating_count": 2,
     "contact_phone": "0988 952 558",
+    "directory_details": {
+      "courtCount": 3,
+      "courtType": "Ngoài trời",
+      "surface": "Acrylic ngoài trời",
+      "prices": {
+        "offPeak": 80000,
+        "peak": 130000,
+        "weekend": 150000
+      },
+      "weekdayRates": [
+        {
+          "start": "05:30",
+          "end": "08:00",
+          "hourly": 90000
+        },
+        {
+          "start": "08:00",
+          "end": "16:00",
+          "hourly": 80000
+        },
+        {
+          "start": "16:00",
+          "end": "21:30",
+          "hourly": 130000
+        },
+        {
+          "start": "21:30",
+          "end": "23:00",
+          "hourly": 100000
+        }
+      ],
+      "weekendRates": [
+        {
+          "start": "05:30",
+          "end": "16:00",
+          "hourly": 110000
+        },
+        {
+          "start": "16:00",
+          "end": "21:30",
+          "hourly": 150000
+        },
+        {
+          "start": "21:30",
+          "end": "23:00",
+          "hourly": 110000
+        }
+      ],
+      "courts": [
+        {
+          "code": "TN02-S01",
+          "label": "Sân 1 (Ngoài trời)"
+        },
+        {
+          "code": "TN02-S02",
+          "label": "Sân 2 (Ngoài trời)"
+        },
+        {
+          "code": "TN02-S03",
+          "label": "Sân 3 (Ngoài trời)"
+        }
+      ]
+    },
     "featured": 0,
     "verified": 0,
     "price": 100000,
@@ -65,6 +193,63 @@
     "rating": 4.4,
     "rating_count": 8,
     "contact_phone": "0868 868 158",
+    "directory_details": {
+      "courtCount": 4,
+      "courtType": "Có mái che",
+      "surface": "Acrylic tiêu chuẩn",
+      "prices": {
+        "offPeak": 100000,
+        "peak": 150000,
+        "weekend": 170000
+      },
+      "weekdayRates": [
+        {
+          "start": "05:00",
+          "end": "08:00",
+          "hourly": 110000
+        },
+        {
+          "start": "08:00",
+          "end": "16:00",
+          "hourly": 100000
+        },
+        {
+          "start": "16:00",
+          "end": "22:00",
+          "hourly": 150000
+        }
+      ],
+      "weekendRates": [
+        {
+          "start": "05:00",
+          "end": "16:00",
+          "hourly": 130000
+        },
+        {
+          "start": "16:00",
+          "end": "22:00",
+          "hourly": 170000
+        }
+      ],
+      "courts": [
+        {
+          "code": "TN03-S01",
+          "label": "Sân 1 (Có mái che)"
+        },
+        {
+          "code": "TN03-S02",
+          "label": "Sân 2 (Có mái che)"
+        },
+        {
+          "code": "TN03-S03",
+          "label": "Sân 3 (Có mái che)"
+        },
+        {
+          "code": "TN03-S04",
+          "label": "Sân 4 (Có mái che)"
+        }
+      ]
+    },
     "featured": 0,
     "verified": 0,
     "price": 100000,
@@ -89,6 +274,67 @@
     "rating": 4.8,
     "rating_count": 13,
     "contact_phone": "0944 796 668",
+    "directory_details": {
+      "courtCount": 5,
+      "courtType": "Hỗn hợp (Có mái che & Ngoài trời)",
+      "surface": "Acrylic tiêu chuẩn",
+      "prices": {
+        "offPeak": 80000,
+        "peak": 130000,
+        "weekend": 150000
+      },
+      "weekdayRates": [
+        {
+          "start": "05:00",
+          "end": "08:00",
+          "hourly": 90000
+        },
+        {
+          "start": "08:00",
+          "end": "16:00",
+          "hourly": 80000
+        },
+        {
+          "start": "16:00",
+          "end": "22:00",
+          "hourly": 130000
+        }
+      ],
+      "weekendRates": [
+        {
+          "start": "05:00",
+          "end": "16:00",
+          "hourly": 110000
+        },
+        {
+          "start": "16:00",
+          "end": "22:00",
+          "hourly": 150000
+        }
+      ],
+      "courts": [
+        {
+          "code": "TN04-S01",
+          "label": "Sân 1 (Có mái che, +10000 VND/h)"
+        },
+        {
+          "code": "TN04-S02",
+          "label": "Sân 2 (Có mái che, +10000 VND/h)"
+        },
+        {
+          "code": "TN04-S03",
+          "label": "Sân 3 (Có mái che, +10000 VND/h)"
+        },
+        {
+          "code": "TN04-S04",
+          "label": "Sân 4 (Ngoài trời)"
+        },
+        {
+          "code": "TN04-S05",
+          "label": "Sân 5 (Ngoài trời)"
+        }
+      ]
+    },
     "featured": 0,
     "verified": 0,
     "price": 100000,
@@ -113,6 +359,73 @@
     "rating": 5,
     "rating_count": 4,
     "contact_phone": "0833 272 899",
+    "directory_details": {
+      "courtCount": 4,
+      "courtType": "Ngoài trời",
+      "surface": "Acrylic chống trơn",
+      "prices": {
+        "offPeak": 70000,
+        "peak": 110000,
+        "weekend": 130000
+      },
+      "weekdayRates": [
+        {
+          "start": "05:00",
+          "end": "08:00",
+          "hourly": 80000
+        },
+        {
+          "start": "08:00",
+          "end": "16:00",
+          "hourly": 70000
+        },
+        {
+          "start": "16:00",
+          "end": "21:30",
+          "hourly": 110000
+        },
+        {
+          "start": "21:30",
+          "end": "23:00",
+          "hourly": 90000
+        }
+      ],
+      "weekendRates": [
+        {
+          "start": "05:00",
+          "end": "16:00",
+          "hourly": 90000
+        },
+        {
+          "start": "16:00",
+          "end": "21:30",
+          "hourly": 130000
+        },
+        {
+          "start": "21:30",
+          "end": "23:00",
+          "hourly": 100000
+        }
+      ],
+      "courts": [
+        {
+          "code": "TN05-S01",
+          "label": "Sân 1 (Ngoài trời)"
+        },
+        {
+          "code": "TN05-S02",
+          "label": "Sân 2 (Ngoài trời)"
+        },
+        {
+          "code": "TN05-S03",
+          "label": "Sân 3 (Ngoài trời)"
+        },
+        {
+          "code": "TN05-S04",
+          "label": "Sân 4 (Ngoài trời)"
+        }
+      ]
+    },
     "featured": 0,
     "verified": 0,
     "price": 100000,
@@ -137,6 +450,83 @@
     "rating": 5,
     "rating_count": 3,
     "contact_phone": "0963 446 610",
+    "directory_details": {
+      "courtCount": 4,
+      "courtType": "Có mái che",
+      "surface": "Acrylic tiêu chuẩn",
+      "prices": {
+        "offPeak": 90000,
+        "peak": 150000,
+        "weekend": 170000
+      },
+      "weekdayRates": [
+        {
+          "start": "00:00",
+          "end": "05:00",
+          "hourly": 90000
+        },
+        {
+          "start": "05:00",
+          "end": "08:00",
+          "hourly": 110000
+        },
+        {
+          "start": "08:00",
+          "end": "16:00",
+          "hourly": 90000
+        },
+        {
+          "start": "16:00",
+          "end": "21:30",
+          "hourly": 150000
+        },
+        {
+          "start": "21:30",
+          "end": "24:00",
+          "hourly": 110000
+        }
+      ],
+      "weekendRates": [
+        {
+          "start": "00:00",
+          "end": "05:00",
+          "hourly": 100000
+        },
+        {
+          "start": "05:00",
+          "end": "16:00",
+          "hourly": 120000
+        },
+        {
+          "start": "16:00",
+          "end": "21:30",
+          "hourly": 170000
+        },
+        {
+          "start": "21:30",
+          "end": "24:00",
+          "hourly": 120000
+        }
+      ],
+      "courts": [
+        {
+          "code": "TN06-S01",
+          "label": "Sân 1 (Có mái che)"
+        },
+        {
+          "code": "TN06-S02",
+          "label": "Sân 2 (Có mái che)"
+        },
+        {
+          "code": "TN06-S03",
+          "label": "Sân 3 (Có mái che)"
+        },
+        {
+          "code": "TN06-S04",
+          "label": "Sân 4 (Có mái che)"
+        }
+      ]
+    },
     "featured": 0,
     "verified": 0,
     "price": 100000,
@@ -161,6 +551,73 @@
     "rating": 5,
     "rating_count": 5,
     "contact_phone": "0352 381 888",
+    "directory_details": {
+      "courtCount": 4,
+      "courtType": "Có mái che",
+      "surface": "Acrylic tiêu chuẩn",
+      "prices": {
+        "offPeak": 90000,
+        "peak": 140000,
+        "weekend": 160000
+      },
+      "weekdayRates": [
+        {
+          "start": "05:00",
+          "end": "08:00",
+          "hourly": 100000
+        },
+        {
+          "start": "08:00",
+          "end": "16:00",
+          "hourly": 90000
+        },
+        {
+          "start": "16:00",
+          "end": "21:30",
+          "hourly": 140000
+        },
+        {
+          "start": "21:30",
+          "end": "22:30",
+          "hourly": 110000
+        }
+      ],
+      "weekendRates": [
+        {
+          "start": "05:00",
+          "end": "16:00",
+          "hourly": 120000
+        },
+        {
+          "start": "16:00",
+          "end": "21:30",
+          "hourly": 160000
+        },
+        {
+          "start": "21:30",
+          "end": "22:30",
+          "hourly": 120000
+        }
+      ],
+      "courts": [
+        {
+          "code": "TN07-S01",
+          "label": "Sân 1 (Có mái che)"
+        },
+        {
+          "code": "TN07-S02",
+          "label": "Sân 2 (Có mái che)"
+        },
+        {
+          "code": "TN07-S03",
+          "label": "Sân 3 (Có mái che)"
+        },
+        {
+          "code": "TN07-S04",
+          "label": "Sân 4 (Có mái che)"
+        }
+      ]
+    },
     "featured": 0,
     "verified": 0,
     "price": 100000,
@@ -185,6 +642,81 @@
     "rating": 4.6,
     "rating_count": 5,
     "contact_phone": "0363 629 629",
+    "directory_details": {
+      "courtCount": 6,
+      "courtType": "Có mái che",
+      "surface": "Acrylic tiêu chuẩn thi đấu",
+      "prices": {
+        "offPeak": 100000,
+        "peak": 160000,
+        "weekend": 180000
+      },
+      "weekdayRates": [
+        {
+          "start": "05:00",
+          "end": "08:00",
+          "hourly": 120000
+        },
+        {
+          "start": "08:00",
+          "end": "16:00",
+          "hourly": 100000
+        },
+        {
+          "start": "16:00",
+          "end": "21:30",
+          "hourly": 160000
+        },
+        {
+          "start": "21:30",
+          "end": "23:00",
+          "hourly": 130000
+        }
+      ],
+      "weekendRates": [
+        {
+          "start": "05:00",
+          "end": "16:00",
+          "hourly": 130000
+        },
+        {
+          "start": "16:00",
+          "end": "21:30",
+          "hourly": 180000
+        },
+        {
+          "start": "21:30",
+          "end": "23:00",
+          "hourly": 140000
+        }
+      ],
+      "courts": [
+        {
+          "code": "TN08-S01",
+          "label": "Sân 1 (Có mái che)"
+        },
+        {
+          "code": "TN08-S02",
+          "label": "Sân 2 (Có mái che)"
+        },
+        {
+          "code": "TN08-S03",
+          "label": "Sân 3 (Có mái che)"
+        },
+        {
+          "code": "TN08-S04",
+          "label": "Sân 4 (Có mái che)"
+        },
+        {
+          "code": "TN08-S05",
+          "label": "Sân 5 (Có mái che)"
+        },
+        {
+          "code": "TN08-S06",
+          "label": "Sân 6 (Có mái che)"
+        }
+      ]
+    },
     "featured": 0,
     "verified": 0,
     "price": 100000,
@@ -209,6 +741,73 @@
     "rating": 5,
     "rating_count": 6,
     "contact_phone": "0925 595 888",
+    "directory_details": {
+      "courtCount": 4,
+      "courtType": "Có mái che",
+      "surface": "Acrylic tiêu chuẩn",
+      "prices": {
+        "offPeak": 100000,
+        "peak": 160000,
+        "weekend": 180000
+      },
+      "weekdayRates": [
+        {
+          "start": "05:00",
+          "end": "08:00",
+          "hourly": 120000
+        },
+        {
+          "start": "08:00",
+          "end": "16:00",
+          "hourly": 100000
+        },
+        {
+          "start": "16:00",
+          "end": "21:30",
+          "hourly": 160000
+        },
+        {
+          "start": "21:30",
+          "end": "23:00",
+          "hourly": 130000
+        }
+      ],
+      "weekendRates": [
+        {
+          "start": "05:00",
+          "end": "16:00",
+          "hourly": 130000
+        },
+        {
+          "start": "16:00",
+          "end": "21:30",
+          "hourly": 180000
+        },
+        {
+          "start": "21:30",
+          "end": "23:00",
+          "hourly": 140000
+        }
+      ],
+      "courts": [
+        {
+          "code": "TN09-S01",
+          "label": "Sân 1 (Có mái che)"
+        },
+        {
+          "code": "TN09-S02",
+          "label": "Sân 2 (Có mái che)"
+        },
+        {
+          "code": "TN09-S03",
+          "label": "Sân 3 (Có mái che)"
+        },
+        {
+          "code": "TN09-S04",
+          "label": "Sân 4 (Có mái che)"
+        }
+      ]
+    },
     "featured": 0,
     "verified": 0,
     "price": 100000,
@@ -233,6 +832,73 @@
     "rating": 4.8,
     "rating_count": 6,
     "contact_phone": "0913 584 852",
+    "directory_details": {
+      "courtCount": 4,
+      "courtType": "Có mái che",
+      "surface": "Acrylic cao cấp",
+      "prices": {
+        "offPeak": 110000,
+        "peak": 170000,
+        "weekend": 190000
+      },
+      "weekdayRates": [
+        {
+          "start": "05:00",
+          "end": "08:00",
+          "hourly": 130000
+        },
+        {
+          "start": "08:00",
+          "end": "16:00",
+          "hourly": 110000
+        },
+        {
+          "start": "16:00",
+          "end": "21:30",
+          "hourly": 170000
+        },
+        {
+          "start": "21:30",
+          "end": "22:30",
+          "hourly": 140000
+        }
+      ],
+      "weekendRates": [
+        {
+          "start": "05:00",
+          "end": "16:00",
+          "hourly": 140000
+        },
+        {
+          "start": "16:00",
+          "end": "21:30",
+          "hourly": 190000
+        },
+        {
+          "start": "21:30",
+          "end": "22:30",
+          "hourly": 150000
+        }
+      ],
+      "courts": [
+        {
+          "code": "TN10-S01",
+          "label": "Sân 1 (Có mái che)"
+        },
+        {
+          "code": "TN10-S02",
+          "label": "Sân 2 (Có mái che)"
+        },
+        {
+          "code": "TN10-S03",
+          "label": "Sân 3 (Có mái che)"
+        },
+        {
+          "code": "TN10-S04",
+          "label": "Sân 4 (Có mái che)"
+        }
+      ]
+    },
     "featured": 0,
     "verified": 0,
     "price": 100000,
@@ -257,6 +923,59 @@
     "rating": 5,
     "rating_count": 1,
     "contact_phone": "0912 345 678",
+    "directory_details": {
+      "courtCount": 3,
+      "courtType": "Ngoài trời",
+      "surface": "Acrylic ngoài trời",
+      "prices": {
+        "offPeak": 80000,
+        "peak": 130000,
+        "weekend": 150000
+      },
+      "weekdayRates": [
+        {
+          "start": "05:00",
+          "end": "08:00",
+          "hourly": 90000
+        },
+        {
+          "start": "08:00",
+          "end": "16:00",
+          "hourly": 80000
+        },
+        {
+          "start": "16:00",
+          "end": "22:00",
+          "hourly": 130000
+        }
+      ],
+      "weekendRates": [
+        {
+          "start": "05:00",
+          "end": "16:00",
+          "hourly": 110000
+        },
+        {
+          "start": "16:00",
+          "end": "22:00",
+          "hourly": 150000
+        }
+      ],
+      "courts": [
+        {
+          "code": "TN11-S01",
+          "label": "Sân 1 (Ngoài trời)"
+        },
+        {
+          "code": "TN11-S02",
+          "label": "Sân 2 (Ngoài trời)"
+        },
+        {
+          "code": "TN11-S03",
+          "label": "Sân 3 (Ngoài trời)"
+        }
+      ]
+    },
     "featured": 0,
     "verified": 0,
     "price": 100000,
@@ -281,6 +1000,73 @@
     "rating": 5,
     "rating_count": 8,
     "contact_phone": "0985 469 555",
+    "directory_details": {
+      "courtCount": 4,
+      "courtType": "Có mái che",
+      "surface": "Acrylic tiêu chuẩn",
+      "prices": {
+        "offPeak": 100000,
+        "peak": 150000,
+        "weekend": 170000
+      },
+      "weekdayRates": [
+        {
+          "start": "05:30",
+          "end": "08:00",
+          "hourly": 110000
+        },
+        {
+          "start": "08:00",
+          "end": "16:00",
+          "hourly": 100000
+        },
+        {
+          "start": "16:00",
+          "end": "21:30",
+          "hourly": 150000
+        },
+        {
+          "start": "21:30",
+          "end": "22:30",
+          "hourly": 120000
+        }
+      ],
+      "weekendRates": [
+        {
+          "start": "05:30",
+          "end": "16:00",
+          "hourly": 130000
+        },
+        {
+          "start": "16:00",
+          "end": "21:30",
+          "hourly": 170000
+        },
+        {
+          "start": "21:30",
+          "end": "22:30",
+          "hourly": 130000
+        }
+      ],
+      "courts": [
+        {
+          "code": "TN12-S01",
+          "label": "Sân 1 (Có mái che)"
+        },
+        {
+          "code": "TN12-S02",
+          "label": "Sân 2 (Có mái che)"
+        },
+        {
+          "code": "TN12-S03",
+          "label": "Sân 3 (Có mái che)"
+        },
+        {
+          "code": "TN12-S04",
+          "label": "Sân 4 (Có mái che)"
+        }
+      ]
+    },
     "featured": 0,
     "verified": 0,
     "price": 100000,
@@ -305,6 +1091,81 @@
     "rating": 5,
     "rating_count": 2,
     "contact_phone": "0589 502 888",
+    "directory_details": {
+      "courtCount": 6,
+      "courtType": "Trong nhà",
+      "surface": "Acrylic tiêu chuẩn giải đấu",
+      "prices": {
+        "offPeak": 110000,
+        "peak": 170000,
+        "weekend": 190000
+      },
+      "weekdayRates": [
+        {
+          "start": "05:00",
+          "end": "08:00",
+          "hourly": 130000
+        },
+        {
+          "start": "08:00",
+          "end": "16:00",
+          "hourly": 110000
+        },
+        {
+          "start": "16:00",
+          "end": "21:30",
+          "hourly": 170000
+        },
+        {
+          "start": "21:30",
+          "end": "24:00",
+          "hourly": 130000
+        }
+      ],
+      "weekendRates": [
+        {
+          "start": "05:00",
+          "end": "16:00",
+          "hourly": 140000
+        },
+        {
+          "start": "16:00",
+          "end": "21:30",
+          "hourly": 190000
+        },
+        {
+          "start": "21:30",
+          "end": "24:00",
+          "hourly": 140000
+        }
+      ],
+      "courts": [
+        {
+          "code": "TN13-S01",
+          "label": "Sân 1 (Trong nhà)"
+        },
+        {
+          "code": "TN13-S02",
+          "label": "Sân 2 (Trong nhà)"
+        },
+        {
+          "code": "TN13-S03",
+          "label": "Sân 3 (Trong nhà)"
+        },
+        {
+          "code": "TN13-S04",
+          "label": "Sân 4 (Trong nhà)"
+        },
+        {
+          "code": "TN13-S05",
+          "label": "Sân 5 (Trong nhà)"
+        },
+        {
+          "code": "TN13-S06",
+          "label": "Sân 6 (Trong nhà)"
+        }
+      ]
+    },
     "featured": 0,
     "verified": 0,
     "price": 100000,
@@ -329,6 +1190,63 @@
     "rating": 5,
     "rating_count": 7,
     "contact_phone": "0978 411 651",
+    "directory_details": {
+      "courtCount": 4,
+      "courtType": "Hỗn hợp (Có mái che & Ngoài trời)",
+      "surface": "Acrylic tiêu chuẩn",
+      "prices": {
+        "offPeak": 90000,
+        "peak": 150000,
+        "weekend": 170000
+      },
+      "weekdayRates": [
+        {
+          "start": "05:00",
+          "end": "08:00",
+          "hourly": 110000
+        },
+        {
+          "start": "08:00",
+          "end": "16:00",
+          "hourly": 90000
+        },
+        {
+          "start": "16:00",
+          "end": "22:00",
+          "hourly": 150000
+        }
+      ],
+      "weekendRates": [
+        {
+          "start": "05:00",
+          "end": "16:00",
+          "hourly": 120000
+        },
+        {
+          "start": "16:00",
+          "end": "22:00",
+          "hourly": 170000
+        }
+      ],
+      "courts": [
+        {
+          "code": "TN14-S01",
+          "label": "Sân 1 (Có mái che, +10000 VND/h)"
+        },
+        {
+          "code": "TN14-S02",
+          "label": "Sân 2 (Có mái che, +10000 VND/h)"
+        },
+        {
+          "code": "TN14-S03",
+          "label": "Sân 3 (Ngoài trời)"
+        },
+        {
+          "code": "TN14-S04",
+          "label": "Sân 4 (Ngoài trời)"
+        }
+      ]
+    },
     "featured": 0,
     "verified": 0,
     "price": 100000,
@@ -353,6 +1271,67 @@
     "rating": 5,
     "rating_count": 3,
     "contact_phone": "0983 765 895",
+    "directory_details": {
+      "courtCount": 5,
+      "courtType": "Có mái che",
+      "surface": "Acrylic cao cấp",
+      "prices": {
+        "offPeak": 110000,
+        "peak": 170000,
+        "weekend": 190000
+      },
+      "weekdayRates": [
+        {
+          "start": "05:30",
+          "end": "08:00",
+          "hourly": 130000
+        },
+        {
+          "start": "08:00",
+          "end": "16:00",
+          "hourly": 110000
+        },
+        {
+          "start": "16:00",
+          "end": "22:00",
+          "hourly": 170000
+        }
+      ],
+      "weekendRates": [
+        {
+          "start": "05:30",
+          "end": "16:00",
+          "hourly": 140000
+        },
+        {
+          "start": "16:00",
+          "end": "22:00",
+          "hourly": 190000
+        }
+      ],
+      "courts": [
+        {
+          "code": "TN15-S01",
+          "label": "Sân 1 (Có mái che)"
+        },
+        {
+          "code": "TN15-S02",
+          "label": "Sân 2 (Có mái che)"
+        },
+        {
+          "code": "TN15-S03",
+          "label": "Sân 3 (Có mái che)"
+        },
+        {
+          "code": "TN15-S04",
+          "label": "Sân 4 (Có mái che)"
+        },
+        {
+          "code": "TN15-S05",
+          "label": "Sân 5 (Có mái che)"
+        }
+      ]
+    },
     "featured": 0,
     "verified": 0,
     "price": 100000,
@@ -377,6 +1356,69 @@
     "rating": 5,
     "rating_count": 2,
     "contact_phone": "0842 229 889",
+    "directory_details": {
+      "courtCount": 3,
+      "courtType": "Ngoài trời",
+      "surface": "Acrylic ngoài trời",
+      "prices": {
+        "offPeak": 80000,
+        "peak": 130000,
+        "weekend": 150000
+      },
+      "weekdayRates": [
+        {
+          "start": "05:00",
+          "end": "08:00",
+          "hourly": 90000
+        },
+        {
+          "start": "08:00",
+          "end": "16:00",
+          "hourly": 80000
+        },
+        {
+          "start": "16:00",
+          "end": "21:30",
+          "hourly": 130000
+        },
+        {
+          "start": "21:30",
+          "end": "23:00",
+          "hourly": 100000
+        }
+      ],
+      "weekendRates": [
+        {
+          "start": "05:00",
+          "end": "16:00",
+          "hourly": 110000
+        },
+        {
+          "start": "16:00",
+          "end": "21:30",
+          "hourly": 150000
+        },
+        {
+          "start": "21:30",
+          "end": "23:00",
+          "hourly": 110000
+        }
+      ],
+      "courts": [
+        {
+          "code": "TN16-S01",
+          "label": "Sân 1 (Ngoài trời)"
+        },
+        {
+          "code": "TN16-S02",
+          "label": "Sân 2 (Ngoài trời)"
+        },
+        {
+          "code": "TN16-S03",
+          "label": "Sân 3 (Ngoài trời)"
+        }
+      ]
+    },
     "featured": 0,
     "verified": 0,
     "price": 100000,
@@ -401,6 +1443,77 @@
     "rating": 4.9,
     "rating_count": 12,
     "contact_phone": "0523 888 888",
+    "directory_details": {
+      "courtCount": 5,
+      "courtType": "Có mái che",
+      "surface": "Acrylic tiêu chuẩn",
+      "prices": {
+        "offPeak": 90000,
+        "peak": 140000,
+        "weekend": 160000
+      },
+      "weekdayRates": [
+        {
+          "start": "05:00",
+          "end": "08:00",
+          "hourly": 100000
+        },
+        {
+          "start": "08:00",
+          "end": "16:00",
+          "hourly": 90000
+        },
+        {
+          "start": "16:00",
+          "end": "21:30",
+          "hourly": 140000
+        },
+        {
+          "start": "21:30",
+          "end": "23:00",
+          "hourly": 110000
+        }
+      ],
+      "weekendRates": [
+        {
+          "start": "05:00",
+          "end": "16:00",
+          "hourly": 120000
+        },
+        {
+          "start": "16:00",
+          "end": "21:30",
+          "hourly": 160000
+        },
+        {
+          "start": "21:30",
+          "end": "23:00",
+          "hourly": 120000
+        }
+      ],
+      "courts": [
+        {
+          "code": "TN17-S01",
+          "label": "Sân 1 (Có mái che)"
+        },
+        {
+          "code": "TN17-S02",
+          "label": "Sân 2 (Có mái che)"
+        },
+        {
+          "code": "TN17-S03",
+          "label": "Sân 3 (Có mái che)"
+        },
+        {
+          "code": "TN17-S04",
+          "label": "Sân 4 (Có mái che)"
+        },
+        {
+          "code": "TN17-S05",
+          "label": "Sân 5 (Có mái che)"
+        }
+      ]
+    },
     "featured": 0,
     "verified": 0,
     "price": 100000,
@@ -425,6 +1538,63 @@
     "rating": 5,
     "rating_count": 2,
     "contact_phone": "0976 123 456",
+    "directory_details": {
+      "courtCount": 4,
+      "courtType": "Trong nhà",
+      "surface": "Thảm PVC / Acrylic trong nhà",
+      "prices": {
+        "offPeak": 100000,
+        "peak": 160000,
+        "weekend": 180000
+      },
+      "weekdayRates": [
+        {
+          "start": "05:30",
+          "end": "08:00",
+          "hourly": 120000
+        },
+        {
+          "start": "08:00",
+          "end": "16:00",
+          "hourly": 100000
+        },
+        {
+          "start": "16:00",
+          "end": "22:00",
+          "hourly": 160000
+        }
+      ],
+      "weekendRates": [
+        {
+          "start": "05:30",
+          "end": "16:00",
+          "hourly": 130000
+        },
+        {
+          "start": "16:00",
+          "end": "22:00",
+          "hourly": 180000
+        }
+      ],
+      "courts": [
+        {
+          "code": "TN18-S01",
+          "label": "Sân 1 (Trong nhà)"
+        },
+        {
+          "code": "TN18-S02",
+          "label": "Sân 2 (Trong nhà)"
+        },
+        {
+          "code": "TN18-S03",
+          "label": "Sân 3 (Trong nhà)"
+        },
+        {
+          "code": "TN18-S04",
+          "label": "Sân 4 (Trong nhà)"
+        }
+      ]
+    },
     "featured": 0,
     "verified": 0,
     "price": 100000,
@@ -449,6 +1619,69 @@
     "rating": 5,
     "rating_count": 4,
     "contact_phone": "0989 334 455",
+    "directory_details": {
+      "courtCount": 3,
+      "courtType": "Ngoài trời",
+      "surface": "Acrylic ngoài trời",
+      "prices": {
+        "offPeak": 80000,
+        "peak": 130000,
+        "weekend": 150000
+      },
+      "weekdayRates": [
+        {
+          "start": "05:00",
+          "end": "08:00",
+          "hourly": 90000
+        },
+        {
+          "start": "08:00",
+          "end": "16:00",
+          "hourly": 80000
+        },
+        {
+          "start": "16:00",
+          "end": "21:30",
+          "hourly": 130000
+        },
+        {
+          "start": "21:30",
+          "end": "22:30",
+          "hourly": 100000
+        }
+      ],
+      "weekendRates": [
+        {
+          "start": "05:00",
+          "end": "16:00",
+          "hourly": 110000
+        },
+        {
+          "start": "16:00",
+          "end": "21:30",
+          "hourly": 150000
+        },
+        {
+          "start": "21:30",
+          "end": "22:30",
+          "hourly": 110000
+        }
+      ],
+      "courts": [
+        {
+          "code": "TN19-S01",
+          "label": "Sân 1 (Ngoài trời)"
+        },
+        {
+          "code": "TN19-S02",
+          "label": "Sân 2 (Ngoài trời)"
+        },
+        {
+          "code": "TN19-S03",
+          "label": "Sân 3 (Ngoài trời)"
+        }
+      ]
+    },
     "featured": 0,
     "verified": 0,
     "price": 100000,
@@ -473,6 +1706,73 @@
     "rating": 4.9,
     "rating_count": 10,
     "contact_phone": "0922 978 505",
+    "directory_details": {
+      "courtCount": 4,
+      "courtType": "Có mái che",
+      "surface": "Acrylic tiêu chuẩn",
+      "prices": {
+        "offPeak": 100000,
+        "peak": 160000,
+        "weekend": 180000
+      },
+      "weekdayRates": [
+        {
+          "start": "05:30",
+          "end": "08:00",
+          "hourly": 120000
+        },
+        {
+          "start": "08:00",
+          "end": "16:00",
+          "hourly": 100000
+        },
+        {
+          "start": "16:00",
+          "end": "21:30",
+          "hourly": 160000
+        },
+        {
+          "start": "21:30",
+          "end": "23:00",
+          "hourly": 130000
+        }
+      ],
+      "weekendRates": [
+        {
+          "start": "05:30",
+          "end": "16:00",
+          "hourly": 130000
+        },
+        {
+          "start": "16:00",
+          "end": "21:30",
+          "hourly": 180000
+        },
+        {
+          "start": "21:30",
+          "end": "23:00",
+          "hourly": 140000
+        }
+      ],
+      "courts": [
+        {
+          "code": "TN20-S01",
+          "label": "Sân 1 (Có mái che)"
+        },
+        {
+          "code": "TN20-S02",
+          "label": "Sân 2 (Có mái che)"
+        },
+        {
+          "code": "TN20-S03",
+          "label": "Sân 3 (Có mái che)"
+        },
+        {
+          "code": "TN20-S04",
+          "label": "Sân 4 (Có mái che)"
+        }
+      ]
+    },
     "featured": 0,
     "verified": 0,
     "price": 100000,
@@ -497,6 +1797,77 @@
     "rating": 4.8,
     "rating_count": 15,
     "contact_phone": "0945 632 666",
+    "directory_details": {
+      "courtCount": 5,
+      "courtType": "Có mái che",
+      "surface": "Acrylic cao cấp",
+      "prices": {
+        "offPeak": 110000,
+        "peak": 170000,
+        "weekend": 200000
+      },
+      "weekdayRates": [
+        {
+          "start": "05:00",
+          "end": "08:00",
+          "hourly": 130000
+        },
+        {
+          "start": "08:00",
+          "end": "16:00",
+          "hourly": 110000
+        },
+        {
+          "start": "16:00",
+          "end": "21:30",
+          "hourly": 170000
+        },
+        {
+          "start": "21:30",
+          "end": "23:30",
+          "hourly": 140000
+        }
+      ],
+      "weekendRates": [
+        {
+          "start": "05:00",
+          "end": "16:00",
+          "hourly": 150000
+        },
+        {
+          "start": "16:00",
+          "end": "21:30",
+          "hourly": 200000
+        },
+        {
+          "start": "21:30",
+          "end": "23:30",
+          "hourly": 150000
+        }
+      ],
+      "courts": [
+        {
+          "code": "TN21-S01",
+          "label": "Sân 1 (Có mái che)"
+        },
+        {
+          "code": "TN21-S02",
+          "label": "Sân 2 (Có mái che)"
+        },
+        {
+          "code": "TN21-S03",
+          "label": "Sân 3 (Có mái che)"
+        },
+        {
+          "code": "TN21-S04",
+          "label": "Sân 4 (Có mái che)"
+        },
+        {
+          "code": "TN21-S05",
+          "label": "Sân 5 (Có mái che)"
+        }
+      ]
+    },
     "featured": 0,
     "verified": 0,
     "price": 100000,
@@ -521,6 +1892,73 @@
     "rating": 5,
     "rating_count": 6,
     "contact_phone": "0339 898 996",
+    "directory_details": {
+      "courtCount": 4,
+      "courtType": "Có mái che",
+      "surface": "Acrylic tiêu chuẩn",
+      "prices": {
+        "offPeak": 90000,
+        "peak": 150000,
+        "weekend": 170000
+      },
+      "weekdayRates": [
+        {
+          "start": "05:00",
+          "end": "08:00",
+          "hourly": 110000
+        },
+        {
+          "start": "08:00",
+          "end": "16:00",
+          "hourly": 90000
+        },
+        {
+          "start": "16:00",
+          "end": "21:30",
+          "hourly": 150000
+        },
+        {
+          "start": "21:30",
+          "end": "22:30",
+          "hourly": 120000
+        }
+      ],
+      "weekendRates": [
+        {
+          "start": "05:00",
+          "end": "16:00",
+          "hourly": 120000
+        },
+        {
+          "start": "16:00",
+          "end": "21:30",
+          "hourly": 170000
+        },
+        {
+          "start": "21:30",
+          "end": "22:30",
+          "hourly": 130000
+        }
+      ],
+      "courts": [
+        {
+          "code": "TN22-S01",
+          "label": "Sân 1 (Có mái che)"
+        },
+        {
+          "code": "TN22-S02",
+          "label": "Sân 2 (Có mái che)"
+        },
+        {
+          "code": "TN22-S03",
+          "label": "Sân 3 (Có mái che)"
+        },
+        {
+          "code": "TN22-S04",
+          "label": "Sân 4 (Có mái che)"
+        }
+      ]
+    },
     "featured": 0,
     "verified": 0,
     "price": 100000,
@@ -545,6 +1983,67 @@
     "rating": 4.7,
     "rating_count": 5,
     "contact_phone": "0983 234 567",
+    "directory_details": {
+      "courtCount": 5,
+      "courtType": "Hỗn hợp (Có mái che & Ngoài trời)",
+      "surface": "Acrylic tiêu chuẩn",
+      "prices": {
+        "offPeak": 90000,
+        "peak": 140000,
+        "weekend": 160000
+      },
+      "weekdayRates": [
+        {
+          "start": "05:00",
+          "end": "08:00",
+          "hourly": 100000
+        },
+        {
+          "start": "08:00",
+          "end": "16:00",
+          "hourly": 90000
+        },
+        {
+          "start": "16:00",
+          "end": "22:00",
+          "hourly": 140000
+        }
+      ],
+      "weekendRates": [
+        {
+          "start": "05:00",
+          "end": "16:00",
+          "hourly": 120000
+        },
+        {
+          "start": "16:00",
+          "end": "22:00",
+          "hourly": 160000
+        }
+      ],
+      "courts": [
+        {
+          "code": "TN23-S01",
+          "label": "Sân 1 (Có mái che, +10000 VND/h)"
+        },
+        {
+          "code": "TN23-S02",
+          "label": "Sân 2 (Có mái che, +10000 VND/h)"
+        },
+        {
+          "code": "TN23-S03",
+          "label": "Sân 3 (Có mái che, +10000 VND/h)"
+        },
+        {
+          "code": "TN23-S04",
+          "label": "Sân 4 (Ngoài trời)"
+        },
+        {
+          "code": "TN23-S05",
+          "label": "Sân 5 (Ngoài trời)"
+        }
+      ]
+    },
     "featured": 0,
     "verified": 0,
     "price": 100000,
@@ -569,6 +2068,63 @@
     "rating": 4.8,
     "rating_count": 7,
     "contact_phone": "0913 286 424",
+    "directory_details": {
+      "courtCount": 4,
+      "courtType": "Có mái che",
+      "surface": "Acrylic tiêu chuẩn",
+      "prices": {
+        "offPeak": 90000,
+        "peak": 150000,
+        "weekend": 170000
+      },
+      "weekdayRates": [
+        {
+          "start": "05:00",
+          "end": "08:00",
+          "hourly": 110000
+        },
+        {
+          "start": "08:00",
+          "end": "16:00",
+          "hourly": 90000
+        },
+        {
+          "start": "16:00",
+          "end": "22:00",
+          "hourly": 150000
+        }
+      ],
+      "weekendRates": [
+        {
+          "start": "05:00",
+          "end": "16:00",
+          "hourly": 120000
+        },
+        {
+          "start": "16:00",
+          "end": "22:00",
+          "hourly": 170000
+        }
+      ],
+      "courts": [
+        {
+          "code": "TN24-S01",
+          "label": "Sân 1 (Có mái che)"
+        },
+        {
+          "code": "TN24-S02",
+          "label": "Sân 2 (Có mái che)"
+        },
+        {
+          "code": "TN24-S03",
+          "label": "Sân 3 (Có mái che)"
+        },
+        {
+          "code": "TN24-S04",
+          "label": "Sân 4 (Có mái che)"
+        }
+      ]
+    },
     "featured": 0,
     "verified": 0,
     "price": 100000,
@@ -593,6 +2149,73 @@
     "rating": 4.9,
     "rating_count": 8,
     "contact_phone": "0973 888 999",
+    "directory_details": {
+      "courtCount": 4,
+      "courtType": "Có mái che",
+      "surface": "Acrylic tiêu chuẩn",
+      "prices": {
+        "offPeak": 80000,
+        "peak": 130000,
+        "weekend": 150000
+      },
+      "weekdayRates": [
+        {
+          "start": "05:00",
+          "end": "08:00",
+          "hourly": 90000
+        },
+        {
+          "start": "08:00",
+          "end": "16:00",
+          "hourly": 80000
+        },
+        {
+          "start": "16:00",
+          "end": "21:30",
+          "hourly": 130000
+        },
+        {
+          "start": "21:30",
+          "end": "22:30",
+          "hourly": 100000
+        }
+      ],
+      "weekendRates": [
+        {
+          "start": "05:00",
+          "end": "16:00",
+          "hourly": 110000
+        },
+        {
+          "start": "16:00",
+          "end": "21:30",
+          "hourly": 150000
+        },
+        {
+          "start": "21:30",
+          "end": "22:30",
+          "hourly": 110000
+        }
+      ],
+      "courts": [
+        {
+          "code": "TN25-S01",
+          "label": "Sân 1 (Có mái che)"
+        },
+        {
+          "code": "TN25-S02",
+          "label": "Sân 2 (Có mái che)"
+        },
+        {
+          "code": "TN25-S03",
+          "label": "Sân 3 (Có mái che)"
+        },
+        {
+          "code": "TN25-S04",
+          "label": "Sân 4 (Có mái che)"
+        }
+      ]
+    },
     "featured": 0,
     "verified": 0,
     "price": 100000,

@@ -1,5 +1,6 @@
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { parse } from 'csv-parse/sync';
+import { readDirectoryDetails } from '../backend/src/directory.js';
 
 const root = new URL('../', import.meta.url);
 const rows = parse(readFileSync(new URL('backend/data/thai-nguyen.csv', root), 'utf8'), {
@@ -31,6 +32,7 @@ const catalog = rows.map((row) => {
     rating: row.so_sao ? Number(row.so_sao.replace(',', '.')) : null,
     rating_count: row.so_luot_danh_gia ? Number(row.so_luot_danh_gia) : null,
     contact_phone: row.so_dien_thoai || null,
+    directory_details:readDirectoryDetails(row, open, close),
     featured: 0, verified: 0, price: 100000, court_count: 0, courts: [],
   };
 });

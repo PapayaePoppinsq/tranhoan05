@@ -4,7 +4,7 @@ import { test, before, after } from 'node:test';
 import { PayOS } from '@payos/node';
 import { createApp } from '../src/index.js';
 import { dateAt, now, recordPayment } from '../src/domain.js';
-import { createDatabase, demoHourlyPrice, syncDirectory, syncDirectoryPhotos } from '../src/db.js';
+import { createDatabase, demoHourlyPrice, syncDirectory, syncDirectoryDetails, syncDirectoryPhotos } from '../src/db.js';
 import { passwordHash, seedAdmin } from '../src/auth.js';
 
 let server, db, base;
@@ -40,6 +40,7 @@ test('imports 25 venue records with operating hours, ratings and supplied images
   assert.equal(venues[0].rating_count,4);
   assert.equal(venues[0].area,'Tân Thịnh');
   assert.equal(venues[0].court_count,0);
+  assert.equal(venues.reduce((count, venue) => count + venue.directory_details.courtCount, 0), 107);
   assert.equal(venues[1].image,'');
   assert.match(venues[6].image,/\/san-thuc-te\/7-/);
   assert.match(venues[7].photo_source,/bvdktuthainguyen.gov.vn/);
@@ -49,6 +50,10 @@ test('imports 25 venue records with operating hours, ratings and supplied images
   assert.deepEqual(venues.slice(4,6).map(({open,close}) => [open,close]), [['05:00','23:00'],['00:00','24:00']]);
   const allDay = (await request(`/venues/6/availability?date=${dateAt(1)}&duration=60`)).body[0];
   assert.equal(allDay.slots.at(-1).end,'24:00');
+  const { body:detail } = await request('/venues/4');
+  assert.deepEqual(detail.directory_details.weekendRates.at(-1), { start:'16:00', end:'22:00', hourly:150000 });
+  assert.match(detail.directory_details.courts[0].label, /\+10000 VND\/h/);
+  assert.equal(detail.court_count, 0);
 });
 
 test('directory questions list real venues without inventing a playing date', async () => {
@@ -56,6 +61,28 @@ test('directory questions list real venues without inventing a playing date', as
   assert.equal(body.mode, 'demo');
   assert.equal(body.criteria.date, undefined);
   assert.match(body.reply, /CLB Pickleball Quyết Thắng/);
+  const named = await request('/chat', { body:{ message:'Sân Quang Minh có bao nhiêu sân nhỏ và giá bao nhiêu?' } });
+  assert.match(named.body.reply, /Quang Minh có 5 sân nhỏ/);
+  assert.match(named.body.reply, /90\.000/);
+});
+
+test('directory details backfill existing venues without changing their booking settings or favorites', () => {
+  const existing = createDatabase(':memory:');
+  try {
+    existing.exec(`INSERT INTO users(id,name,name_key,phone,email,password) VALUES (1,'Local','local','0900000001','local@example.com','fixture');
+      INSERT INTO venues(id,directory_id,name,area,address,open,close,price,image,verified) VALUES
+        (54,1,'Sân đã xác minh','A','B','07:00','21:00',125000,'/api/media/mine',1);
+      INSERT INTO courts(id,venue_id,name) VALUES (92,54,'Sân chính');
+      INSERT INTO favorites(user_id,venue_id) VALUES (1,54);`);
+    const csv = [{ id:1, directory_details:{ courtCount:6 } }];
+    syncDirectoryDetails(existing, csv);
+    syncDirectoryDetails(existing, csv);
+    const { id, verified, price, image, open, directory_details } = existing.prepare('SELECT * FROM venues').get();
+    assert.deepEqual({ id, verified, price, image, open, directory_details:JSON.parse(directory_details) },
+      { id:54, verified:1, price:125000, image:'/api/media/mine', open:'07:00', directory_details:{ courtCount:6 } });
+    assert.equal(existing.prepare('SELECT venue_id FROM favorites').get().venue_id, 54);
+    assert.equal(existing.prepare('SELECT venue_id FROM courts WHERE id=92').get().venue_id, 54);
+  } finally { existing.close(); }
 });
 
 test('replaces old directory without reusing booking identifiers or re-importing on restart', () => {

@@ -12,6 +12,29 @@ export function Detail() {
   return <DetailPage key={id + loc.search} id={encodeURIComponent(id)}/>;
 }
 
+function DirectoryDetails({ details }) {
+  const groups = [
+    { label:'Thứ 2 đến Thứ 6', rates:details.weekdayRates },
+    { label:'Thứ 7 và Chủ nhật', rates:details.weekendRates },
+  ];
+  return <section className="panel venue-directory" aria-labelledby="directory-heading">
+    <h2 id="directory-heading">Sân nhỏ và bảng giá tham khảo</h2>
+    <p className="muted">{details.courtCount} sân nhỏ · {details.courtType} · {details.surface}</p>
+    <div className="venue-rates">{groups.map(({ label, rates }) => <table key={label}>
+      <caption>{label}</caption>
+      <thead><tr><th scope="col">Khung giờ</th><th scope="col">Giá mỗi giờ</th></tr></thead>
+      <tbody>{rates.map(({ start, end, hourly }) => <tr key={start}>
+        <td>{start}–{end}</td><td>{money(hourly)}</td>
+      </tr>)}</tbody>
+    </table>)}</div>
+    <details>
+      <summary>Danh sách sân nhỏ và phụ phí</summary>
+      <ul>{details.courts.map(({ code, label }) => <li key={code}><span>{code}</span> {label}</li>)}</ul>
+    </details>
+    <p className="muted">Thông tin từ danh bạ. Liên hệ chủ sân để xác nhận giá, phụ phí và lịch trống.</p>
+  </section>;
+}
+
 function DetailPage({ id }) {
   const site = useSite();
   const [params] = useSearchParams();
@@ -93,6 +116,7 @@ function DetailPage({ id }) {
       {routeError && <p className="muted">{routeError}</p>}
       <div className="form-actions"><RouteLink venue={venue} origin={site.origin}/><button className="button secondary"
         onClick={() => site.setOverlay('position')}><MapPin size={17}/>{site.origin ? 'Đổi điểm xuất phát' : 'Chọn điểm xuất phát'}</button></div></section>}
+    {venue.directory_details && <DirectoryDetails details={venue.directory_details}/>}
     <div className="detail-columns"><section className="panel schedule"><div className="section-heading"><h2>Chọn lịch chơi</h2>
       <label className="sr-only" htmlFor="booking-date">Chọn ngày khác</label><input id="booking-date" type="date" min={today()} max={today(30)}
         value={date} disabled={!canBook} onChange={(e) => chooseDate(e.target.value)}/></div>

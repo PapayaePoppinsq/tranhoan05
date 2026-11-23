@@ -47,7 +47,7 @@ Thư mục `worker/` đóng gói API Express trong một Worker và dùng một 
 3. Trong dự án Pages `tranhoan05`, đặt biến môi trường production `BACKEND_ORIGIN` bằng gốc HTTPS của Worker, không có `/api` ở cuối. Redeploy Pages từ nhánh `main` để hàm proxy đọc biến mới.
 4. Đặt secret `ADMIN_PASSWORD` riêng cho Worker bằng `wrangler secret put ADMIN_PASSWORD --config worker/wrangler.jsonc`, rồi chạy `wrangler deploy --config worker/wrangler.jsonc --durable-objects-code-update-mode immediate` để Durable Object nhận cấu hình mới ngay. Không ghi mật khẩu vào Git. Số đăng nhập quản trị là `0900000000`.
 
-Các sân từ CSV chưa có bảng giá và sân nhỏ đã xác minh. Quản trị viên cần nhập thông tin thật trước khi mở đặt. Khi chưa có đủ khóa payOS, API trả `payment: "off"` và giao diện không cho chốt đơn; chỉ bật thanh toán sau khi kiểm tra tài khoản nhận tiền, webhook và thông tin sân. `PUBLIC_ORIGIN` trong `worker/wrangler.jsonc` phải trùng chính xác miền Pages đang dùng.
+CSV có bảng giá và danh sách sân nhỏ tham khảo. Quản trị viên cần đối chiếu với chủ sân rồi nhập thông tin vận hành trước khi mở đặt. Khi chưa có đủ khóa payOS, API trả `payment: "off"` và giao diện không cho chốt đơn; chỉ bật thanh toán sau khi kiểm tra tài khoản nhận tiền, webhook và thông tin sân. `PUBLIC_ORIGIN` trong `worker/wrangler.jsonc` phải trùng chính xác miền Pages đang dùng.
 
 ## Cấu hình dịch vụ ngoài
 
@@ -70,8 +70,8 @@ Tìm thủ công, Đặt nhanh và Chatbot cùng đi qua **Xem lại đơn**. Ba
 
 ## Dữ liệu và ảnh
 
-`backend/data/thai-nguyen.csv` là file danh bạ duy nhất. File chứa 25 sân và các cột liên kết ảnh từ bản CSV mới nhất. Sân hiển thị loại địa điểm, địa chỉ, giờ hoạt động, đánh giá, số điện thoại và vị trí theo dữ liệu trong file. Với dòng ghi cả một khung giờ và “Mở cả ngày”, lịch dùng khung giờ cụ thể. “Mở cả ngày (24/24)” dùng 00:00–24:00.
+`backend/data/thai-nguyen.csv` là file danh bạ duy nhất, lấy từ `danh_sach_25_san_pickleball_thai_nguyen_day_du-v2.csv`. File có 25 cụm sân và 107 sân nhỏ. Trang chi tiết hiển thị loại sân, mặt sân, bảng giá theo ngày và giờ, danh sách sân nhỏ và phụ phí nếu có. Với dòng ghi cả một khung giờ và “Mở cả ngày”, lịch dùng khung giờ cụ thể. “Mở cả ngày (24/24)” dùng 00:00–24:00.
 
 `backend/data/catalog-photos.json` ghi ảnh đã chọn theo mã, tên và địa chỉ sân, nguồn đối chiếu và lý do bỏ trống. Có 16 ảnh chụp lưu trong `frontend/public/images/san-thuc-te/`. Chín sân còn lại hiện “Chưa có ảnh xác minh” vì dữ liệu chỉ có thẻ giới thiệu, logo hoặc có dấu hiệu khác địa điểm. Trên trang chi tiết, nút **Nguồn ảnh** mở liên kết đối chiếu. Ảnh đầu trang lấy từ [Daniel Gomez](https://unsplash.com/photos/GmkIC2N8lwE).
 
-CSV chưa có bảng giá hoặc danh sách sân nhỏ. Chế độ thử dùng một sân thử mỗi địa điểm với giá mô phỏng 100.000 ₫/giờ. Muốn nhận đặt thực tế, thêm sân nhỏ thực tế và giá đã kiểm tra trong trang quản trị trước khi xác minh. Máy chủ thay danh bạ cũ một lần khi khởi động bản này. Đơn có sẵn giữ định danh sân gốc để xem lại lịch sử.
+Worker đồng bộ chi tiết CSV theo mã danh bạ vào các cụm sân hiện có. Giá và sân nhỏ trong CSV chỉ phục vụ tham khảo trên web và chatbot. Chế độ thử vẫn dùng một sân thử mỗi địa điểm với giá mô phỏng 100.000 ₫/giờ. Giá đặt thật và lịch trống lấy từ cấu hình vận hành sau khi quản trị viên xác minh.

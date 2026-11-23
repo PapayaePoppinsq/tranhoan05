@@ -49,7 +49,8 @@ export function CourtCard({ venue, saved, onSave, distance, date, after, demo })
       <VenueRating venue={venue}/>
       <span className="court-verify">{venue.verified ? <><ShieldCheck size={14}/> Đã xác minh</> : 'Tham khảo'}</span></div>
     <div className="court-bottom"><div>{venue.verified ? <><strong>{money(venue.price)}</strong><span> / giờ</span></> :
-      <span>{demo ? `Giá thử ${money(venue.price)}/giờ` : 'Chưa có giá xác minh'}</span>}</div><Link className="small-button" to={url}>Xem sân</Link></div>
+      <span>{demo ? `Giá thử ${money(venue.price)}/giờ` : venue.directory_details ?
+        `Tham khảo từ ${money(venue.directory_details.prices.offPeak)}/giờ` : 'Chưa có giá xác minh'}</span>}</div><Link className="small-button" to={url}>Xem sân</Link></div>
   </div></article>;
 }
 

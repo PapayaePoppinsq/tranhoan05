@@ -21,7 +21,9 @@ export function validDate(day) {
 
 const venueSelect = `SELECT v.*, (SELECT count(*) FROM courts c WHERE c.venue_id=v.id AND c.active=1 AND c.is_demo=0) AS court_count
   FROM venues v`;
-function publicVenue({ owner_id, ...venue }) { return venue; }
+function publicVenue({ owner_id, directory_details, ...venue }) {
+  return { ...venue, directory_details:directory_details ? JSON.parse(directory_details) : null };
+}
 export function listVenues(db) {
   return db.prepare(`${venueSelect} WHERE v.active=1 ORDER BY v.featured DESC, v.id`).all().map(publicVenue);
 }

@@ -3,6 +3,7 @@ import { mkdirSync, readFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
 import { parse } from 'csv-parse/sync';
+import { readDirectoryDetails } from './directory.js';
 
 const ddl = `
 CREATE TABLE IF NOT EXISTS users (
@@ -62,7 +63,8 @@ export function upgradeSchema(db) {
   transaction(db, () => {
     const columns = new Set(db.prepare('PRAGMA table_info(venues)').all().map(({ name }) => name));
     for (const [name, type] of Object.entries({ directory_id: 'INTEGER', category: 'TEXT', rating: 'REAL',
-      rating_count: 'INTEGER', contact_phone: 'TEXT', source_hours: 'TEXT', photo_source: 'TEXT' })) {
+      rating_count: 'INTEGER', contact_phone: 'TEXT', source_hours: 'TEXT', photo_source: 'TEXT',
+      directory_details: 'TEXT' })) {
       if (!columns.has(name)) db.exec(`ALTER TABLE venues ADD COLUMN ${name} ${type}`);
     }
     if (!db.prepare('PRAGMA table_info(courts)').all().some(({ name }) => name === 'is_demo')) {
@@ -121,14 +123,20 @@ function readDirectory() {
       throw new Error(`Liên kết bản đồ không hợp lệ ở sân ${id}`);
     }
     return { id, name: row.ten_san, area, address: row.dia_chi, lat, lng, open, close, mapUrl: mapUrl.href,
-      category: row.the_loai || null, rating, count, phone: row.so_dien_thoai || null, hours: row.thoi_gian_hoat_dong };
+      category: row.the_loai || null, rating, count, phone: row.so_dien_thoai || null, hours: row.thoi_gian_hoat_dong,
+      directory_details:readDirectoryDetails(row, open, close) };
   });
 }
 
 export function syncDirectory(db) {
+  const rows = readDirectory();
+  seedLocalDirectory(db, rows);
+  syncDirectoryDetails(db, rows);
+}
+
+function seedLocalDirectory(db, rows) {
   const importedVersion = db.prepare("SELECT value FROM app_data WHERE key='directory_catalog'");
   if (importedVersion.get()?.value === catalogVersion) return;
-  const rows = readDirectory();
   if (!rows.length) throw new Error('Danh bạ trống.');
   transaction(db, () => {
     if (importedVersion.get()?.value === catalogVersion) return;
@@ -155,6 +163,20 @@ export function syncDirectory(db) {
       insertCourt.run(lastCourt + row.id, venueId, 'Sân thử');
     }
     db.prepare("INSERT OR REPLACE INTO app_data(key,value) VALUES ('directory_catalog',?)").run(catalogVersion);
+  });
+}
+
+export function syncDirectoryDetails(db, rows) {
+  const details = rows.map((row) => [row.directory_id ?? row.id, JSON.stringify(row.directory_details)]);
+  const version = createHash('sha256').update(JSON.stringify(details)).digest('hex');
+  const importedVersion = db.prepare("SELECT value FROM app_data WHERE key='directory_details'");
+  if (importedVersion.get()?.value === version) return;
+  transaction(db, () => {
+    if (importedVersion.get()?.value === version) return;
+    // Apply CSV metadata in place so IDs and operational records stay attached to the same venue.
+    const update = db.prepare('UPDATE venues SET directory_details=? WHERE directory_id=? AND active=1');
+    for (const [directoryId, value] of details) update.run(value, directoryId);
+    db.prepare("INSERT OR REPLACE INTO app_data(key,value) VALUES ('directory_details',?)").run(version);
   });
 }
 
