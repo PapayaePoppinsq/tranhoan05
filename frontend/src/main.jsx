@@ -118,6 +118,19 @@ function Site() {
   const { overlay, setOverlay, origin, user, notice, setNotice } = useSite();
   const location = useLocation();
   const [backToChat, setBackToChat] = useState(false);
+  useEffect(() => {
+    const surfaces = '.court-card, .schedule, .summary, .venue-directory, .quick-result';
+    function followPointer(event) {
+      if (event.pointerType !== 'mouse' && event.pointerType !== 'pen') return;
+      const surface = event.target instanceof Element ? event.target.closest(surfaces) : null;
+      if (!surface) return;
+      const bounds = surface.getBoundingClientRect();
+      surface.style.setProperty('--spot-x', `${event.clientX - bounds.left}px`);
+      surface.style.setProperty('--spot-y', `${event.clientY - bounds.top}px`);
+    }
+    document.addEventListener('pointermove', followPointer, { passive: true });
+    return () => document.removeEventListener('pointermove', followPointer);
+  }, []);
   useEffect(() => { window.scrollTo({ top:0 }); }, [location.pathname]);
   useEffect(() => {
     if (overlay === 'chat') setBackToChat(true);

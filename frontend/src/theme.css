@@ -90,6 +90,16 @@ select option { background: #202431; color: #f5f7fa; }
 .court-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
 .court-card { background: #171a25; border: 1px solid #343a4a; border-radius: 3px; box-shadow: none; }
 .court-card:hover { border-color: #7798b0; box-shadow: 0 16px 34px #0005; transform: translateY(-3px); }
+.court-card, .schedule, .summary, .venue-directory, .quick-result { position: relative; isolation: isolate; }
+@media (hover: hover) and (pointer: fine) {
+  :is(.court-card, .schedule, .summary, .venue-directory, .quick-result)::after {
+    content: ''; position: absolute; inset: 0; z-index: 3; border-radius: inherit; pointer-events: none;
+    opacity: 0; transition: opacity .2s ease;
+    background: radial-gradient(260px circle at var(--spot-x, 50%) var(--spot-y, 50%), rgba(61, 186, 255, .38) 0%, rgba(87, 228, 199, .13) 40%, transparent 75%);
+    box-shadow: inset 0 0 0 1px rgba(134, 215, 248, .32);
+  }
+  :is(.court-card, .schedule, .summary, .venue-directory, .quick-result):hover::after { opacity: 1; }
+}
 .court-photo { aspect-ratio: 16 / 10; background: #202b37; }
 .court-photo img { filter: saturate(.78) contrast(1.07); }
 .court-photo .featured-tag { background: #131722e8; color: #ecf4f8; border: 1px solid #647186; border-radius: 2px; font: 500 .67rem 'IBM Plex Mono', monospace; text-transform: uppercase; }
@@ -248,4 +258,7 @@ select option { background: #202431; color: #f5f7fa; }
   .floating-chat { bottom: 13px; right: 13px; border-radius: 2px; }
 }
 
-@media (prefers-reduced-motion: reduce) { .button { transition: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .button { transition: none; }
+  :is(.court-card, .schedule, .summary, .venue-directory, .quick-result)::after { display: none; }
+}
