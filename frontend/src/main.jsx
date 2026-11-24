@@ -32,7 +32,7 @@ function PositionDialog({ onClose }) {
 }
 
 function QuickDialog({ onClose }) {
-  const { origin, user } = useSite();
+  const { origin } = useSite();
   const todayValue = today();
   const [date, setDate] = useState(''), [budget, setBudget] = useState(''), [after, setAfter] = useState('');
   const [preference, setPreference] = useState('');
@@ -48,24 +48,34 @@ function QuickDialog({ onClose }) {
     finally { setBusy(false); }
   }
   useEffect(() => { suggest(); }, []);
-  return <Dialog title="Đặt nhanh thông minh" icon={<Zap size={22}/>} onClose={onClose}>
-    <p className="muted">Hệ thống kiểm tra giờ trống; Gemma AI chọn gợi ý theo thói quen và mong muốn của bạn.</p>
-    <form onSubmit={suggest} className="quick-form"><label className="quick-preference">Mong muốn thêm (không bắt buộc)
-      <input maxLength={200} value={preference} placeholder="Ví dụ: muốn chơi gần nhà, rẻ hơn hoặc tối cuối tuần"
+  const saturday = (6 - new Date(`${todayValue}T12:00:00Z`).getUTCDay() + 7) % 7;
+  function toggleRoof() {
+    setPreference((value) => /ưu tiên sân có mái che/i.test(value) ?
+      value.replace(/\s*ưu tiên sân có mái che/ig, '').trim() : `${value} ưu tiên sân có mái che`.trim());
+  }
+  return <Dialog title="Tìm giờ phù hợp" icon={<CalendarDays size={21}/>} onClose={onClose} className="quick-dialog">
+    <p className="muted">Chọn khung giờ phù hợp theo lịch và ngân sách của bạn.</p>
+    <form onSubmit={suggest} className="quick-form"><label className="quick-preference">Bạn muốn ưu tiên điều gì?
+      <input maxLength={200} value={preference} placeholder="Ví dụ: gần nhà, giá mềm, buổi tối…"
         onChange={(e) => setPreference(e.target.value)}/></label>
-      <label>Ngày chơi (để trống để tự chọn)<input type="date" min={todayValue} max={today(30)} value={date} onChange={(e) => setDate(e.target.value)}/></label>
-      <label>Sau giờ<input type="time" value={after} onChange={(e) => setAfter(e.target.value)}/></label>
-      <label>Ngân sách (₫)<input min="0" max="10000000" type="number" value={budget} placeholder="Không giới hạn" onChange={(e) => setBudget(e.target.value)}/></label>
-      <button className="button primary" disabled={busy}>{busy ? 'Đang tìm…' : 'AI gợi ý'}</button></form>
-    <Alert>{error}</Alert>{insight && <div className="quick-insight" role="status">
-      <strong>{mode === 'ai' ? 'Gemma AI đã xếp gợi ý từ các khung giờ trống' :
-        'Đang xếp gợi ý theo dữ liệu vì AI chưa phản hồi'} · {insight.bookableVenueCount} cụm sân mở đặt trực tuyến</strong>
-      <span>{insight.historyCount ? `Dựa trên ${insight.historyCount} lượt đặt thành công` :
-        user ? 'Bạn chưa có lượt đặt thành công; hệ thống ưu tiên giờ còn trống' : 'Đăng nhập để gợi ý học từ lịch sử đặt'}
-        {insight.favoriteCount ? ` · ${insight.favoriteCount} sân đã lưu` : ''}
-        {insight.locationUsed ? ' · có tính khoảng cách từ điểm bạn chọn' : ''}.</span>
-    </div>}
-    {results?.length ? <ResultList results={results} onChoose={onClose} highlightFirst/> :
+      <div className="quick-chips" aria-label="Chọn nhanh mong muốn">
+        <button type="button" className={`chip ${date === todayValue && after === '18:00' ? 'on' : ''}`}
+          aria-pressed={date === todayValue && after === '18:00'} onClick={() => {setDate(todayValue);setAfter('18:00');}}>Tối nay</button>
+        <button type="button" className={`chip ${date === today(saturday) && after === '18:00' ? 'on' : ''}`}
+          aria-pressed={date === today(saturday) && after === '18:00'} onClick={() => {setDate(today(saturday));setAfter('18:00');}}>Cuối tuần</button>
+        <button type="button" className={`chip ${budget === '119999' ? 'on' : ''}`}
+          aria-pressed={budget === '119999'} onClick={() => setBudget('119999')}>Dưới 120k</button>
+        <button type="button" className={`chip ${/ưu tiên sân có mái che/i.test(preference) ? 'on' : ''}`}
+          aria-pressed={/ưu tiên sân có mái che/i.test(preference)} onClick={toggleRoof}>Có mái che</button>
+      </div>
+      <label>Ngày chơi<input type="date" min={todayValue} max={today(30)} value={date} onChange={(e) => setDate(e.target.value)}/></label>
+      <label>Từ giờ<input type="time" value={after} onChange={(e) => setAfter(e.target.value)}/></label>
+      <label className="quick-budget">Ngân sách tối đa<input min="0" max="10000000" type="number" value={budget} placeholder="Không giới hạn" onChange={(e) => setBudget(e.target.value)}/></label>
+      <button className="button primary" disabled={busy}>{busy ? 'Đang tìm giờ…' : 'Tìm giờ phù hợp'}</button></form>
+    <Alert>{error}</Alert>{busy && <p className="quick-summary" role="status">Đang kiểm tra lịch trống…</p>}
+    {insight && <p className="quick-summary" role="status">{results?.length || 0} khung giờ trống phù hợp · {insight.bookableVenueCount} cụm sân nhận đặt trực tuyến
+      {mode === 'ai' && preference.trim() ? ' · Đã xét mong muốn của bạn' : ''}</p>}
+    {results?.length ? <ResultList results={results} onChoose={onClose} variant="quick"/> :
       results && <p className="muted">Chưa có giờ trống phù hợp trong {insight?.searchedDays || 7} ngày đã tìm. Hãy đổi ngày, giờ hoặc ngân sách.</p>}
   </Dialog>;
 }
@@ -126,7 +136,7 @@ function Site() {
       <Route path="*" element={<div className="shell page"><Empty title="Không tìm thấy trang" action={<Link className="button primary" to="/">Về trang tìm sân</Link>}/></div>}/>
     </Routes></main>
     <footer className="site-footer"><div className="shell"><Brand/><span>Tìm và đặt sân pickleball tại Thái Nguyên.</span><Link to="/">Tìm sân <ArrowUpRight size={15}/></Link></div></footer>
-    {location.pathname !== '/quan-tri' && <button className="floating-chat" onClick={() => setOverlay('chat')}><MessageCircle size={22}/><span>Trợ lý tìm sân</span></button>}
+    {location.pathname !== '/quan-tri' && <button className="floating-chat" aria-label="Mở trợ lý tìm sân" onClick={() => setOverlay('chat')}><MessageCircle size={22}/><span>Trợ lý tìm sân</span></button>}
     {(overlay === 'chat' || overlay === 'position' && backToChat) && <ChatDialog onClose={close}/>}
     {overlay === 'position' && <PositionDialog onClose={backToChat ? () => setOverlay('chat') : close}/>}
     {overlay === 'quick' && <QuickDialog onClose={close}/>}

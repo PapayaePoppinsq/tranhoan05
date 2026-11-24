@@ -45,6 +45,9 @@ export function Home() {
 
   const venues = useMemo(() => (source.value ?? []).filter((venue) => {
     if (group === 'featured' && !venue.featured) return false;
+    if (group === 'online' && !(venue.verified && venue.court_count > 0)) return false;
+    if (group === 'roof' && !/mái che/i.test(venue.directory_details?.courtType ?? '')) return false;
+    if (group === 'affordable' && knownPrice(venue) > 120000) return false;
     if (filter.area && venue.area !== filter.area) return false;
     if (price && knownPrice(venue) > Number(price)) return false;
     return sameText(`${venue.name} ${venue.area} ${venue.address}`).includes(sameText(filter.query.trim()));
@@ -87,7 +90,10 @@ export function Home() {
         <p>{source.loading ? 'Đang tải danh sách sân…' : `${venues.length} cụm sân${filter.area ? ` tại ${filter.area}` : ' tại Thái Nguyên'}`}</p></div>
         <button className="button secondary locate" onClick={() => site.setOverlay('position')}><Crosshair size={17}/>{site.origin ? 'Đổi vị trí' : 'Dùng vị trí của tôi'}</button></div>
       <div className="filter-row"><div className="filter-chips" aria-label="Bộ lọc sân">
-        <button className={`chip ${group === 'all' ? 'on' : ''}`} onClick={() => setGroup('all')} aria-pressed={group === 'all'}>Tất cả sân</button>
+        <button className={`chip ${group === 'all' ? 'on' : ''}`} onClick={() => setGroup('all')} aria-pressed={group === 'all'}>Tất cả</button>
+        <button className={`chip ${group === 'online' ? 'on' : ''}`} onClick={() => setGroup('online')} aria-pressed={group === 'online'}>Đặt trực tuyến</button>
+        <button className={`chip ${group === 'roof' ? 'on' : ''}`} onClick={() => setGroup('roof')} aria-pressed={group === 'roof'}>Có mái che</button>
+        <button className={`chip ${group === 'affordable' ? 'on' : ''}`} onClick={() => setGroup('affordable')} aria-pressed={group === 'affordable'}>Giá mềm</button>
         <button className={`chip ${group === 'featured' ? 'on' : ''}`} onClick={() => setGroup('featured')} aria-pressed={group === 'featured'}>Nổi bật</button>
         <button className={`chip ${availability ? 'on' : ''}`} onClick={() => setAvailability(!availability)} aria-pressed={availability}>Còn giờ trống</button>
         <label className="chip select-chip"><SlidersHorizontal size={15}/><select aria-label="Giá mỗi giờ" value={price} onChange={(e) => setPrice(e.target.value)}>

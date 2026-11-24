@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { CalendarDays, Clock3, Heart, MapPin, Navigation, ShieldCheck, Sparkles, Star, X } from 'lucide-react';
+import { CalendarDays, Clock3, Heart, MapPin, Navigation, Sparkles, Star, X } from 'lucide-react';
 import { detailsUrl, longDate, money, reviewUrl, today } from './api';
 
 export function Brand() {
@@ -44,25 +44,47 @@ export function VenueRating({ venue }) {
 
 export function CourtCard({ venue, saved, onSave, distance, date, after, demo }) {
   const url = detailsUrl(venue.id, date, after);
+  const canBook = Boolean(venue.verified && venue.court_count > 0);
+  const count = venue.court_count || venue.directory_details?.courtCount;
   return <article className="court-card"><div className="court-photo"><Link to={url} aria-label={`Xem ${venue.name}`}>
     <VenuePicture venue={venue}/></Link>
-    {venue.featured ? <span className="featured-tag"><Sparkles size={13}/> Nổi bật</span> : null}
+    {canBook ? <span className="featured-tag">Đặt trực tuyến</span> :
+      venue.featured ? <span className="featured-tag"><Sparkles size={13}/> Nổi bật</span> : null}
+    {venue.rating != null && <div className="court-photo-rating"><VenueRating venue={venue}/></div>}
     {venue.image && venue.image_sample ? <span className="photo-caption">Ảnh minh họa</span> : null}
     <button type="button" className={`save-button ${saved ? 'saved' : ''}`} aria-pressed={saved}
       aria-label={saved ? `Bỏ lưu ${venue.name}` : `Lưu ${venue.name}`} onClick={() => onSave(venue.id)}><Heart size={20}/></button>
-  </div><div className="court-body"><div className="court-location"><MapPin size={15}/>{venue.area || 'Thái Nguyên'}
-      {distance && <span title={distance.type === 'route' ? 'Theo đường đi' : 'Đường chim bay'}>· {distance.km.toFixed(1)} km{distance.type === 'straight' ? ' (chim bay)' : ''}</span>}</div>
-    <h3><Link to={url}>{venue.name}</Link></h3>
-    <div className="court-meta"><span><Clock3 size={16}/>{venue.open === '00:00' && venue.close === '24:00' ? 'Mở 24 giờ' : `${venue.open}–${venue.close}`}</span>
-      <VenueRating venue={venue}/>
-      <span className="court-verify">{venue.verified ? <><ShieldCheck size={14}/> Đã xác minh</> : 'Tham khảo'}</span></div>
+  </div><div className="court-body"><h3><Link to={url}>{venue.name}</Link></h3>
+    <div className="court-keyfacts"><p className="court-address" title={venue.address}><MapPin size={15}/><span>{venue.address || venue.area || 'Thái Nguyên'}</span></p>
+      <div className="court-meta"><span><Clock3 size={15}/>{venue.open === '00:00' && venue.close === '24:00' ? 'Mở 24 giờ' : `${venue.open}–${venue.close}`}</span>
+        {count > 0 && <span>{count} sân nhỏ{!canBook && ' theo danh bạ'}</span>}
+        {distance && <span title={distance.type === 'route' ? 'Theo đường đi' : 'Đường chim bay'}>{distance.km.toFixed(1)} km{distance.type === 'straight' ? ' đường chim bay' : ''}</span>}</div></div>
     <div className="court-bottom"><div>{venue.verified ? <><strong>{money(venue.price)}</strong><span> / giờ</span></> :
       <span>{demo ? `Giá thử ${money(venue.price)}/giờ` : venue.directory_details ?
-        `Tham khảo từ ${money(venue.directory_details.prices.offPeak)}/giờ` : 'Chưa có giá xác minh'}</span>}</div><Link className="small-button" to={url}>Xem sân</Link></div>
+        `Tham khảo từ ${money(venue.directory_details.prices.offPeak)}/giờ` : 'Chưa có giá xác minh'}</span>}</div><Link className="small-button" to={url}>{canBook ? 'Xem lịch' : 'Xem sân'}</Link></div>
   </div></article>;
 }
 
-export function ResultList({ results, onChoose, highlightFirst = false }) {
+export function ResultList({ results, onChoose, highlightFirst = false, variant = 'default' }) {
+  if (variant === 'quick') return <div className="results quick-results">{results.map((result, index) => {
+    const isWeekend = [0, 6].includes(new Date(`${result.date}T12:00:00Z`).getUTCDay());
+    const tag = index === 0 ? 'Phù hợp nhất' : isWeekend ? 'Cuối tuần' :
+      results.some((item) => item.amount > result.amount) &&
+      result.amount === Math.min(...results.map((item) => item.amount)) ? 'Giá tốt' : null;
+    const reason = result.reason?.split(' · ').filter((item) => item !== 'Khung giờ còn trống').join(' · ');
+    const day = new Intl.DateTimeFormat('vi-VN', { timeZone:'UTC', weekday:'long', day:'2-digit',
+      month:'2-digit', year:'numeric' }).format(new Date(`${result.date}T12:00:00Z`));
+    const court = result.courtName.replace(/^sân/i, 'Sân');
+    return <article className={`result quick-result ${index === 0 ? 'result-best' : ''}`}
+      key={`${result.courtId}:${result.date}:${result.time}`}>
+      <div className="quick-result-main">{tag && <span className="result-tag">{tag}</span>}
+        <strong className="quick-venue-name">{result.venueName}</strong>
+        <p className="quick-slot-line"><strong>{court}</strong><span>·</span><strong>{result.time}–{result.end}</strong></p>
+        <p className="quick-slot-date">{day}</p>{reason && <small>{reason}</small>}</div>
+      <div className="quick-result-action"><strong>{money(result.amount)}<small>/{result.duration === 60 ? 'giờ' : `${result.duration} phút`}</small></strong>
+        <Link onClick={onChoose} to={reviewUrl(result)} className="small-button">Xem lại đơn</Link></div>
+    </article>;
+  })}</div>;
   return <div className="results">{results.map((result, index) => <article className={`result ${highlightFirst && index === 0 ? 'result-best' : ''}`} key={`${result.courtId}:${result.date}:${result.time}`}>
     <div>{highlightFirst && index === 0 && <span className="result-tag">Gợi ý phù hợp nhất</span>}
       <strong>{result.venueName}</strong><p>{result.courtName} · {result.time}–{result.end} · {longDate(result.date)}</p>
