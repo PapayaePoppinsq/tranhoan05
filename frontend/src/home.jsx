@@ -70,8 +70,8 @@ export function Home() {
   return <>
     <section className="hero"><div className="shell hero-inner">
       <div className="hero-copy"><div className="hero-place"><MapPin size={14}/> PICKLEBALL TẠI THÁI NGUYÊN</div>
-        <h1>Tìm sân gần bạn.<br/><em>Đặt lịch ra sân.</em></h1>
-        <p>Xem sân trống, chọn giờ hợp ý và giữ chỗ ngay trên web.</p>
+        <h1>Tìm đúng sân.<br/><em>Ra sân đúng giờ.</em></h1>
+        <p>Xem sân pickleball tại Thái Nguyên, chọn giờ phù hợp và đặt ngay trên web.</p>
         <div className="hero-actions"><a className="button lime" href="#tim-san"><Search size={20}/> Tìm sân ngay</a>
           <button className="button glass" onClick={() => site.setOverlay('quick')}><Zap size={18}/> Đặt nhanh thông minh</button></div>
       </div></div></section>

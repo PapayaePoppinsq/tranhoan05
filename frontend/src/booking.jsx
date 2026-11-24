@@ -137,21 +137,25 @@ function DetailPage({ id }) {
       </div>}
       {!canBook && !venue.courts.length && <p className="muted">Chưa có sân nhỏ nào đang hoạt động để đặt.</p>}
       {slotData.loading && canBook ? <Loading>Đang kiểm tra giờ trống…</Loading> : canBook && court ? <>
+        <h3 className="slot-heading">Giờ bắt đầu – kết thúc <small>Giá mỗi khung đã tính theo thời lượng bạn chọn</small></h3>
         <div className="slot-legend"><span><b/> Còn trống</span><span className="booked"><b/> Đã đặt</span><span className="held"><b/> Đang giữ</span></div>
         {!court.slots.length && <p className="muted">Thời lượng này vượt quá giờ hoạt động.</p>}
         <div className="slots">{court.slots.map((slot) => <button type="button" key={slot.time}
           className={`slot ${slot.status} ${current?.time === slot.time ? 'picked' : ''}`}
           disabled={slot.status !== 'available'} aria-pressed={current?.time === slot.time} onClick={() => {setTouched(true);setCourtId(court.id);setSelected(slot.time);}}>
-          <strong>{slot.time}</strong><small>{slot.status === 'booked' ? 'Đã đặt' : slot.status === 'held' ? 'Đang giữ' :
-            slot.status === 'past' ? 'Đã qua' : `đến ${slot.end}`}</small></button>)}</div>
+          <strong>{slot.time}–{slot.end}</strong><small>{slot.status === 'booked' ? 'Đã đặt' : slot.status === 'held' ? 'Đang giữ' :
+            slot.status === 'past' ? 'Đã qua' : `${money(slot.amount)} / ${duration} phút`}</small></button>)}</div>
         {targetTime && !touched && !current && court.slots.find((slot) => slot.time === targetTime && slot.status === 'available') &&
           <button className="text-button" onClick={() => {setTouched(true);setCourtId(court.id);setSelected(targetTime);}}>Chọn khung tìm kiếm {targetTime}</button>}
       </> : canBook && !slotData.error && <p className="muted">Hiện chưa tải được lịch đặt cho sân nhỏ này.</p>}
     </section><aside className="panel summary"><h2>Đơn của bạn</h2><p className="muted">{venue.name}</p><dl className="summary-list">
       <div><dt>Ngày</dt><dd>{longDate(date)}</dd></div><div><dt>Sân nhỏ</dt><dd>{court?.name || 'Chưa chọn'}</dd></div>
-      <div><dt>Giờ chơi</dt><dd>{current ? `${current.time}–${current.end}` : 'Chưa chọn'}</dd></div></dl>
+      <div><dt>Giờ chơi</dt><dd>{current ? `${current.time}–${current.end}` : 'Chưa chọn'}</dd></div>
+      <div><dt>Thời lượng</dt><dd>{duration} phút</dd></div>
+      <div><dt>Đơn giá trực tuyến</dt><dd>{money(venue.price)}/giờ</dd></div></dl>
       {current && proposed && <p className="demo-caption">Gợi ý đặt nhanh · {proposed.reason}. Bạn có thể đổi sân hoặc giờ.</p>}
-      <div className="total"><span>Tổng tiền</span><strong>{current ? money(current.amount) : '—'}</strong></div>
+      {venue.directory_details && <p className="rate-disclaimer">Bảng giá theo khung giờ ở trên lấy từ danh bạ để tham khảo. Số tiền đặt trực tuyến cho khung đã chọn được hiển thị bên dưới.</p>}
+      <div className="total"><span>Giá cho khung đã chọn</span><strong>{current ? money(current.amount) : '—'}</strong></div>
       {current ? <Link className="button primary wide" to={reviewUrl({venueId:venue.id,courtId:court.id,date,time:current.time,duration})}>Xem lại đơn</Link> :
         <button className="button primary wide" disabled>Chọn khung giờ</button>}
     </aside></div>

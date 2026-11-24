@@ -10,6 +10,7 @@ import { Detail, Review, Payment, History } from './booking';
 import { Account, Admin } from './account';
 import { SiteProvider, useSite } from './state';
 import './style.css';
+import './theme.css';
 
 function PositionDialog({ onClose }) {
   const { origin, setOrigin } = useSite();
