@@ -141,7 +141,9 @@ function Site() {
   return <><a className="skip-link" href="#noi-dung">Đến nội dung chính</a><header className="site-header"><div className="shell nav-row"><Brand/>
     <nav aria-label="Điều hướng chính"><NavLink to="/" end>Tìm sân</NavLink><NavLink to="/lich-su"><CalendarDays size={16}/> Lịch sử</NavLink>
       <NavLink to="/da-luu"><Heart size={16}/> Sân đã lưu</NavLink>{manage && <NavLink to="/quan-tri">Quản trị</NavLink>}</nav>
-    <div className="nav-actions"><button className="nav-location" aria-label="Chọn điểm xuất phát" onClick={() => setOverlay('position')}><MapPin size={18}/><span>{origin ? 'Đã chọn vị trí' : 'Thái Nguyên'}</span></button>
+    <div className="nav-actions">
+      {location.pathname !== '/quan-tri' && <button className="nav-chat" aria-label="Mở trợ lý tìm sân" title="Trợ lý tìm sân" onClick={() => setOverlay('chat')}><MessageCircle size={18}/><span>Trợ lý</span></button>}
+      <button className="nav-location" aria-label="Chọn điểm xuất phát" onClick={() => setOverlay('position')}><MapPin size={18}/><span>{origin ? 'Đã chọn vị trí' : 'Thái Nguyên'}</span></button>
       <Link className="account-link" to="/tai-khoan"><CircleUserRound size={18}/><span>{user ? 'Tài khoản' : 'Đăng nhập'}</span></Link></div></div></header>
     <main id="noi-dung" tabIndex={-1}><Routes>
       <Route path="/" element={<Home/>}/><Route path="/da-luu" element={<Saved/>}/><Route path="/san/:id" element={<Detail/>}/>
@@ -150,7 +152,6 @@ function Site() {
       <Route path="*" element={<div className="shell page"><Empty title="Không tìm thấy trang" action={<Link className="button primary" to="/">Về trang tìm sân</Link>}/></div>}/>
     </Routes></main>
     <footer className="site-footer"><div className="shell"><Brand/><span>Tìm và đặt sân pickleball tại Thái Nguyên.</span><Link to="/">Tìm sân <ArrowUpRight size={15}/></Link></div></footer>
-    {location.pathname !== '/quan-tri' && <button className="floating-chat" aria-label="Mở trợ lý tìm sân" onClick={() => setOverlay('chat')}><MessageCircle size={22}/><span>Trợ lý tìm sân</span></button>}
     {(overlay === 'chat' || overlay === 'position' && backToChat) && <ChatDialog onClose={close}/>}
     {overlay === 'position' && <PositionDialog onClose={backToChat ? () => setOverlay('chat') : close}/>}
     {overlay === 'quick' && <QuickDialog onClose={close}/>}

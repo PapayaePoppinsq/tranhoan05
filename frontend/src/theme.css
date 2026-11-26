@@ -39,6 +39,9 @@ select option { background: #202431; color: #f5f7fa; }
 .site-header nav a { border-radius: 0; color: #aeb5c4; font: 600 .9rem 'DM Sans', system-ui, sans-serif; text-transform: none; letter-spacing: 0; }
 .site-header nav a:hover, .site-header nav a.active { background: transparent; color: #fff; text-decoration: underline; text-decoration-color: #a8e8f1; text-underline-offset: 7px; }
 .site-header .nav-location { color: #b8c7d6; }
+.nav-chat { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 44px; min-width: 44px; padding: 8px; background: transparent; border: 0; color: #b8c7d6; font-weight: 700; font-size: .87rem; }
+.nav-chat svg { color: var(--lime); }
+.nav-chat:hover { color: var(--text); background: var(--pale); }
 .site-header .account-link { border: 0; border-radius: 2px; min-height: 45px; padding-inline: 17px; color: #0c1118; background: linear-gradient(105deg, #339aff, #4be6c8 55%, #e2ff4f); font: 600 .73rem 'IBM Plex Mono', monospace; text-transform: uppercase; }
 .site-header .account-link:hover { filter: brightness(1.12); background: linear-gradient(105deg, #339aff, #4be6c8 55%, #e2ff4f); }
 .site-footer { background: #10121b; border-color: #303544; }
@@ -205,9 +208,6 @@ select option { background: #202431; color: #f5f7fa; }
 .alert, .notice { background: #3a2429; border-color: #945362; color: #ffd9dc; border-radius: 2px; }
 .dialog { color: #f4f6f9; }
 .dialog::backdrop { background: #03050bcb; }
-.floating-chat { background: #d9ff5d; color: #0b131b; border: 0; border-radius: 2px; box-shadow: 0 8px 30px #0006; }
-.floating-chat svg { color: #0b131b; }
-.floating-chat:hover { background: #ecff9b; }
 .chat-log { background: #11151f; border-color: #3b4353; border-radius: 2px; }
 .chat-bubble { background: #252c3a; color: #eef2f8; border-radius: 2px; }
 .chat-user .chat-bubble { background: #2c4050; }
@@ -240,6 +240,7 @@ select option { background: #202431; color: #f5f7fa; }
   .site-header .nav-row { min-height: 70px; }
   .site-header nav { border-top: 1px solid #303747; }
   .site-header nav a { min-height: 44px; }
+  .nav-chat span { display: none; }
   .hero-inner { padding-block: 32px; }
   .home-content .court-section { margin-top: 36px; }
 }
@@ -274,10 +275,8 @@ select option { background: #202431; color: #f5f7fa; }
   .dialog-inner, .quick-dialog .dialog-inner { padding: 17px; }
   .quick-dialog .quick-form { grid-template-columns: 1fr 1fr; }
   .quick-dialog .quick-form input { font-size: 16px; }
-  .floating-chat { bottom: 13px; right: 13px; border-radius: 2px; }
-  .site-footer { padding-bottom: 64px; }
   .detail:has(.mobile-booking-action) { padding-bottom: 104px; }
-  .mobile-booking-action { display: flex; position: fixed; z-index: 490; left: 10px; right: 70px; bottom: max(12px, env(safe-area-inset-bottom)); align-items: center; justify-content: space-between; gap: 8px; padding: 7px 8px 7px 12px; background: #181f2c; border: 1px solid #4a566c; border-radius: 6px; box-shadow: 0 6px 24px #0009; }
+  .mobile-booking-action { display: flex; position: fixed; z-index: 490; left: 10px; right: 10px; bottom: max(12px, env(safe-area-inset-bottom)); align-items: center; justify-content: space-between; gap: 8px; padding: 7px 8px 7px 12px; background: #181f2c; border: 1px solid #4a566c; border-radius: 6px; box-shadow: 0 6px 24px #0009; }
   .mobile-booking-action span, .mobile-booking-action strong { display: block; }
   .mobile-booking-action span { font-size: .75rem; color: var(--muted); }
   .mobile-booking-action .button { min-height: 44px; padding-inline: 9px; white-space: nowrap; }
