@@ -47,10 +47,12 @@ function DetailPage({ id }) {
   const [prefill, setPrefill] = useState(null), [touched, setTouched] = useState(false);
   const [reload, bump] = useState(0), [routeError, setRouteError] = useState('');
   const detail = useApi(`/venues/${id}`);
-  const catalog = useCatalog(Boolean(detail.error));
+  const catalog = useCatalog(Boolean(detail.error && (detail.status == null || detail.status >= 500)));
   const venue = detail.value || catalog.value?.find((item) => String(item.id) === id);
   const catalogOnly = Boolean(!detail.value && venue);
-  const slotData = useApi(venue && !catalogOnly ? `/venues/${id}/availability?${new URLSearchParams({date,duration})}` : null, reload);
+  const canBook = Boolean(!catalogOnly && venue?.courts?.length && (site.config?.demo ||
+    (venue.verified && site.config?.payment === 'payos')));
+  const slotData = useApi(canBook ? `/venues/${id}/availability?${new URLSearchParams({date,duration})}` : null, reload);
   const targetTime = params.get('time');
   const requestedSlot = params.has('court') && targetTime;
   const proposed = !touched && prefill?.date === date && prefill.duration === duration ? prefill : null;
@@ -59,14 +61,14 @@ function DetailPage({ id }) {
   const current = court?.slots.find((slot) => slot.time === (selected || initialTime || proposed?.time) && slot.status === 'available');
   const mapVenues = useMemo(() => venue ? [venue] : [], [venue]);
   useEffect(() => {
-    if (!venue || catalogOnly || touched || site.sessionLoading || requestedSlot) return;
+    if (!canBook || touched || site.sessionLoading || requestedSlot) return;
     const controller = new AbortController();
     api('/quick', { signal:controller.signal, body:{ venueId:venue.id,date,duration,
       after:targetTime || undefined,origin:site.origin || undefined } }).then(({results}) => {
       if (!controller.signal.aborted) setPrefill(results[0] || null);
     }, () => {});
     return () => controller.abort();
-  }, [venue, catalogOnly, date, duration, targetTime, requestedSlot, site.origin, site.sessionLoading, touched]);
+  }, [venue, canBook, date, duration, targetTime, requestedSlot, site.origin, site.sessionLoading, touched]);
   useEffect(() => {
     if (!site.origin || !venue || !showMap || catalogOnly) { setRoute(null); setRouteError(''); return; }
     const controller = new AbortController();
@@ -84,8 +86,7 @@ function DetailPage({ id }) {
   if (detail.error && !venue) return <div className="shell page"><Alert>{catalog.error || detail.error}</Alert><Link to="/">Về danh sách sân</Link></div>;
   if (!venue) return null;
   const saved = site.favorites.includes(venue.id);
-  const canBook = Boolean(venue.courts.length && (site.config?.demo ||
-    (venue.verified && site.config?.payment === 'payos')));
+  const review = current ? reviewUrl({venueId:venue.id,courtId:court.id,date,time:current.time,duration}) : null;
   function chooseDate(day) {
     if (!isBookingDate(day)) return;
     setTouched(true);
@@ -102,7 +103,7 @@ function DetailPage({ id }) {
       <VenueRating venue={venue}/>{venue.category && <span>{venue.category}</span>}
       {venue.court_count > 0 && <span>{venue.court_count} sân nhỏ</span>}
       {venue.contact_phone && <a className="text-button" href={`tel:${venue.contact_phone.replace(/[^+\d]/g, '')}`}><Phone size={16}/>{venue.contact_phone}</a>}
-      <span>{venue.verified ? `${money(venue.price)}/giờ` : site.config?.demo ? `Giá thử ${money(venue.price)}/giờ` : 'Chưa có giá xác minh'}</span>
+      {canBook && <span>{site.config.demo ? 'Giá thử ' : ''}{money(venue.price)}/giờ</span>}
       <button className="text-button" onClick={() => setShowMap(!showMap)} aria-expanded={showMap}>
         <MapPin size={17}/>{showMap ? 'Ẩn bản đồ' : 'Xem bản đồ'}</button></div>
     {catalogOnly && <div className="info-box" role="status"><strong>Danh bạ tham khảo</strong>
@@ -117,10 +118,10 @@ function DetailPage({ id }) {
       {routeError && <p className="muted">{routeError}</p>}
       <div className="form-actions"><RouteLink venue={venue} origin={site.origin}/><button className="button secondary"
         onClick={() => site.setOverlay('position')}><MapPin size={17}/>{site.origin ? 'Đổi điểm xuất phát' : 'Chọn điểm xuất phát'}</button></div></section>}
-    {venue.directory_details && <DirectoryDetails details={venue.directory_details}/>}
-    <div className="detail-columns"><section className="panel schedule"><div className="section-heading"><h2>Chọn lịch chơi</h2>
-      <label className="sr-only" htmlFor="booking-date">Chọn ngày khác</label><input id="booking-date" type="date" min={today()} max={today(30)}
-        value={date} disabled={!canBook} onChange={(e) => chooseDate(e.target.value)}/></div>
+    <div className={canBook ? 'detail-columns' : 'detail-columns schedule-only'}><section className="panel schedule"><div className="section-heading"><h2>{canBook ? 'Chọn lịch chơi' : 'Đặt sân trực tuyến'}</h2>
+      {canBook && <><label className="sr-only" htmlFor="booking-date">Chọn ngày khác</label><input id="booking-date" type="date" min={today()} max={today(30)}
+        value={date} onChange={(e) => chooseDate(e.target.value)}/></>}</div>
+      {catalogOnly && <p className="muted">Chưa tải được lịch. Dùng số liên hệ của sân để hỏi giờ còn trống.</p>}
       {canBook && <DateStrip date={date} onChange={chooseDate}/>}
       {canBook && <div className="form-split schedule-filters"><label>Sân nhỏ<select value={court?.id ?? (venue.courts.some((item) => item.id === courtId) ? courtId : venue.courts[0].id)}
         onChange={(e) => {setTouched(true);setCourtId(Number(e.target.value));setSelected(null);}}><option value="" disabled>Chọn sân nhỏ</option>
@@ -128,17 +129,20 @@ function DetailPage({ id }) {
         <label>Thời lượng<select value={duration} onChange={(e) => {setTouched(true);setDuration(Number(e.target.value));setSelected(null);}}>
           {[30,60,90,120,150,180].map((d) => <option key={d} value={d}>{d} phút</option>)}</select></label></div>}
       <Alert>{slotData.error}</Alert>{slotData.error && <button className="button secondary" onClick={() => bump((n) => n + 1)}>Tải lại lịch</button>}
-      {!canBook && venue.courts.length > 0 && <div className="listed-courts">
+      {!catalogOnly && site.configError && <><Alert>Chưa kiểm tra được trạng thái đặt trực tuyến.</Alert>
+        <button className="button secondary" onClick={site.refreshConfig}>Kiểm tra lại</button></>}
+      {!catalogOnly && !site.config && !site.configError && <Loading>Đang kiểm tra trạng thái đặt…</Loading>}
+      {!canBook && site.config && venue.courts.length > 0 && <div className="listed-courts">
         <h3>{venue.courts.length} sân nhỏ đã thêm</h3>
         <ul>{venue.courts.map((item) => <li key={item.id}>{item.name}</li>)}</ul>
         <p className="muted">Các sân này chưa hiển thị lịch trống để đặt trực tuyến.
           {!venue.verified && ' Quản trị viên cần xác minh cụm sân và giá.'}
           {site.config?.payment === 'off' && ' Hệ thống cần cấu hình thanh toán.'}</p>
       </div>}
-      {!canBook && !venue.courts.length && <p className="muted">Chưa có sân nhỏ nào đang hoạt động để đặt.</p>}
+      {!catalogOnly && !canBook && !venue.courts.length && <p className="muted">Chưa có sân nhỏ nào mở lịch trực tuyến.</p>}
       {slotData.loading && canBook ? <Loading>Đang kiểm tra giờ trống…</Loading> : canBook && court ? <>
         <h3 className="slot-heading">Giờ bắt đầu – kết thúc <small>Giá mỗi khung đã tính theo thời lượng bạn chọn</small></h3>
-        <div className="slot-legend"><span><b/> Còn trống</span><span className="booked"><b/> Đã đặt</span><span className="held"><b/> Đang giữ</span></div>
+        <div className="slot-legend"><span><b/> Còn trống</span><span className="booked"><b/> Đã đặt</span><span className="held"><b/> Đang giữ</span><span className="past"><b/> Đã qua</span></div>
         {!court.slots.length && <p className="muted">Thời lượng này vượt quá giờ hoạt động.</p>}
         <div className="slots">{court.slots.map((slot) => <button type="button" key={slot.time}
           className={`slot ${slot.status} ${current?.time === slot.time ? 'picked' : ''}`}
@@ -148,17 +152,19 @@ function DetailPage({ id }) {
         {targetTime && !touched && !current && court.slots.find((slot) => slot.time === targetTime && slot.status === 'available') &&
           <button className="text-button" onClick={() => {setTouched(true);setCourtId(court.id);setSelected(targetTime);}}>Chọn khung tìm kiếm {targetTime}</button>}
       </> : canBook && !slotData.error && <p className="muted">Hiện chưa tải được lịch đặt cho sân nhỏ này.</p>}
-    </section><aside className="panel summary"><h2>Đơn của bạn</h2><p className="muted">{venue.name}</p><dl className="summary-list">
+    </section>{canBook && <aside className="panel summary"><h2>Đơn của bạn</h2><p className="muted">{venue.name}</p><dl className="summary-list">
       <div><dt>Ngày</dt><dd>{longDate(date)}</dd></div><div><dt>Sân nhỏ</dt><dd>{court?.name || 'Chưa chọn'}</dd></div>
       <div><dt>Giờ chơi</dt><dd>{current ? `${current.time}–${current.end}` : 'Chưa chọn'}</dd></div>
       <div><dt>Thời lượng</dt><dd>{duration} phút</dd></div>
-      <div><dt>Đơn giá trực tuyến</dt><dd>{money(venue.price)}/giờ</dd></div></dl>
+      <div><dt>{site.config.demo ? 'Đơn giá thử' : 'Đơn giá trực tuyến'}</dt><dd>{money(venue.price)}/giờ</dd></div></dl>
       {current && proposed && <p className="demo-caption">Gợi ý đặt nhanh · {proposed.reason}. Bạn có thể đổi sân hoặc giờ.</p>}
-      {venue.directory_details && <p className="rate-disclaimer">Bảng giá theo khung giờ ở trên lấy từ danh bạ để tham khảo. Số tiền đặt trực tuyến cho khung đã chọn được hiển thị bên dưới.</p>}
-      <div className="total"><span>Giá cho khung đã chọn</span><strong>{current ? money(current.amount) : '—'}</strong></div>
-      {current ? <Link className="button primary wide" to={reviewUrl({venueId:venue.id,courtId:court.id,date,time:current.time,duration})}>Xem lại đơn</Link> :
+      <div className="total" aria-live="polite"><span>Giá cho khung đã chọn</span><strong>{current ? money(current.amount) : '—'}</strong></div>
+      {review ? <Link className="button primary wide" to={review}>Xem lại đơn</Link> :
         <button className="button primary wide" disabled>Chọn khung giờ</button>}
-    </aside></div>
+    </aside>}</div>
+    {venue.directory_details && <DirectoryDetails details={venue.directory_details}/>}
+    {review && <div className="mobile-booking-action"><div><span>{current.time}–{current.end}</span><strong>{money(current.amount)}</strong></div>
+      <Link className="button primary" to={review}>Xem lại đơn</Link></div>}
   </div>;
 }
 
@@ -167,7 +173,7 @@ export function Review() {
   return <ReviewPage key={location.search} search={location.search}/>;
 }
 function ReviewPage({search}) {
-  const { user, sessionLoading, config } = useSite();
+  const { user, sessionLoading, config, configError, refreshConfig } = useSite();
   const nav = useNavigate();
   const query = new URLSearchParams(search);
   const [quote, setQuote] = useState(null), [busy, setBusy] = useState(false), [error, setError] = useState('');
@@ -200,8 +206,10 @@ function ReviewPage({search}) {
         <p className="muted">Khi bạn xác nhận, hệ thống kiểm tra lại lịch và giữ chỗ tối đa 10 phút để thanh toán.</p>
         {config?.demo && <p className="demo-caption">Chế độ thử · không thu tiền.</p>}
         {config?.payment === 'off' && <Alert>Thanh toán trực tuyến chưa mở.</Alert>}
-        <div className="form-actions">{sessionLoading ? <Loading/> : user ? <button className="button primary" onClick={reserve} disabled={busy || config?.payment === 'off'}>
+        {configError && <Alert>Chưa kiểm tra được trạng thái thanh toán.</Alert>}
+        <div className="form-actions">{sessionLoading ? <Loading/> : user ? <button className="button primary" onClick={reserve} disabled={busy || !config || config.payment === 'off'}>
           {busy ? 'Đang giữ chỗ…' : 'Xác nhận và giữ chỗ'}</button> : <Link className="button primary" to={`/tai-khoan?${new URLSearchParams({next:`/xem-lai${search}`})}`}>Đăng nhập để đặt</Link>}
+          {configError && <button className="button secondary" onClick={refreshConfig}>Kiểm tra thanh toán</button>}
           <Link className="button secondary" to={edit}>Sửa lựa chọn</Link>
           {error && <button className="text-button" onClick={() => refresh((n) => n + 1)}>Kiểm tra lại lịch và giá</button>}</div>
       </> : <div className="form-actions"><button className="button secondary" onClick={() => refresh((n) => n + 1)}>Thử lại</button>

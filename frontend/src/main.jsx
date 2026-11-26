@@ -138,12 +138,12 @@ function Site() {
   }, [overlay]);
   const close = () => setOverlay(null);
   const manage = user && ['admin','owner'].includes(user.role);
-  return <><header className="site-header"><div className="shell nav-row"><Brand/>
+  return <><a className="skip-link" href="#noi-dung">Đến nội dung chính</a><header className="site-header"><div className="shell nav-row"><Brand/>
     <nav aria-label="Điều hướng chính"><NavLink to="/" end>Tìm sân</NavLink><NavLink to="/lich-su"><CalendarDays size={16}/> Lịch sử</NavLink>
       <NavLink to="/da-luu"><Heart size={16}/> Sân đã lưu</NavLink>{manage && <NavLink to="/quan-tri">Quản trị</NavLink>}</nav>
     <div className="nav-actions"><button className="nav-location" aria-label="Chọn điểm xuất phát" onClick={() => setOverlay('position')}><MapPin size={18}/><span>{origin ? 'Đã chọn vị trí' : 'Thái Nguyên'}</span></button>
       <Link className="account-link" to="/tai-khoan"><CircleUserRound size={18}/><span>{user ? 'Tài khoản' : 'Đăng nhập'}</span></Link></div></div></header>
-    <main id="noi-dung"><Routes>
+    <main id="noi-dung" tabIndex={-1}><Routes>
       <Route path="/" element={<Home/>}/><Route path="/da-luu" element={<Saved/>}/><Route path="/san/:id" element={<Detail/>}/>
       <Route path="/xem-lai" element={<Review/>}/><Route path="/thanh-toan/:id" element={<Payment/>}/><Route path="/lich-su" element={<History/>}/>
       <Route path="/tai-khoan" element={<Account/>}/><Route path="/quan-tri" element={<Admin/>}/>

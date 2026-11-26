@@ -99,7 +99,7 @@ export async function createApp(config, database) {
   const protect = protectRequests(config);
   const json = (size) => express.json({ limit: size, inflate: false });
   const limit = (n, ms) => rateLimit({ limit: n, windowMs: ms, standardHeaders: 'draft-8', legacyHeaders: false,
-    keyGenerator: (req) => ipKeyGenerator(req.get('CF-Connecting-IP') || req.ip || '127.0.0.1'),
+    keyGenerator: (req) => ipKeyGenerator((config.behindCloudflare && req.get('CF-Connecting-IP')) || req.ip || '127.0.0.1'),
     message: { error: 'Quá nhiều yêu cầu. Hãy thử lại sau.' } });
   const authLimit = limit(18, 600000);
   const searchLimit = limit(35, 60000);
@@ -170,6 +170,8 @@ export async function createApp(config, database) {
     const query = z.object({ date: daySchema.optional(), after: timeSchema.optional(), available: z.literal('1').optional() }).parse(req.query);
     const venues = listVenues(db);
     if (query.available && query.date) {
+      if (!validDate(query.date)) throw new HttpError(400, 'Chọn ngày hợp lệ trong 30 ngày tới.');
+      if (config.paymentMode === 'off') return res.json([]);
       return res.json(venues.filter((venue) => (config.demo || venue.verified) &&
         availability(db, getVenue(db, venue.id, config.demo), query.date, 60).some((court) => court.slots.some((slot) =>
           slot.status === 'available' && (!query.after || slot.time >= query.after)))));
@@ -371,9 +373,9 @@ export async function createApp(config, database) {
     const id = transaction(db, () => {
       const admin = req.user.role === 'admin';
       const owner = admin ? ownerOf(db, v.ownerPhone) : req.user.id;
-      const { lastInsertRowid } = db.prepare(`INSERT INTO venues(name,area,address,lat,lng,open,close,price,image,featured,verified,owner_id,image_sample)
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`).run(v.name,v.area,v.address,v.lat,v.lng,v.open,v.close,v.price,v.image ?? '',
-        Number(admin && !!v.featured), Number(admin && !!v.verified),owner,0);
+      const { lastInsertRowid } = db.prepare(`INSERT INTO venues(name,area,address,lat,lng,open,close,price,image,featured,verified,active,owner_id,image_sample)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`).run(v.name,v.area,v.address,v.lat,v.lng,v.open,v.close,v.price,v.image ?? '',
+        Number(admin && !!v.featured), Number(admin && !!v.verified), Number(v.active ?? true),owner,0);
       db.prepare("INSERT INTO courts(venue_id,name) VALUES (?,'Sân 1')").run(lastInsertRowid);
       return lastInsertRowid;
     });

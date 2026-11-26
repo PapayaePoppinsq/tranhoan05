@@ -9,6 +9,7 @@ export const minute = (hour) => Number(hour.slice(0, 2)) * 60 + Number(hour.slic
 export const timeOf = (mins) => `${String(Math.floor(mins / 60)).padStart(2, '0')}:${String(mins % 60).padStart(2, '0')}`;
 export const slotDate = (ts) => new Date(ts * 1000 + 7 * 3600000).toISOString().slice(0, 10);
 export const slotTime = (ts) => new Date(ts * 1000 + 7 * 3600000).toISOString().slice(11, 16);
+const bookingEndTime = (starts, ends) => timeOf(minute(slotTime(starts)) + (ends - starts) / 60);
 
 export class HttpError extends Error {
   constructor(status, message) { super(message); this.status = status; }
@@ -77,7 +78,7 @@ export function quoteBooking(db, { courtId, date, time, duration }, demo) {
   if (db.prepare(`SELECT id FROM bookings WHERE court_id=? AND starts < ? AND ends > ? AND (${activeBlocks})`)
     .get(courtId, ends, starts)) throw new HttpError(409, 'Khung giờ vừa hết chỗ. Hãy chọn giờ khác.');
   return { courtId, venueId: court.venue_id, venueName: court.venue_name, courtName: court.court_name,
-    address: court.address, date, time, end: slotTime(ends), amount: Math.round(court.price * duration / 60),
+    address: court.address, date, time, end: bookingEndTime(starts, ends), amount: Math.round(court.price * duration / 60),
     starts, ends, duration, verified: Boolean(court.verified) };
 }
 
@@ -87,7 +88,7 @@ export function showBooking(row) {
   if (!row) return null;
   const status = row.status === 'pending' && row.hold_until <= now() ? 'expired' : row.status;
   return { id: row.id, code: row.code, venueId: row.venueId, venueName: row.venueName, courtName: row.courtName,
-    address: row.address, date: slotDate(row.starts), time: slotTime(row.starts), end: slotTime(row.ends),
+    address: row.address, date: slotDate(row.starts), time: slotTime(row.starts), end: bookingEndTime(row.starts, row.ends),
     amount: row.amount, expiresAt: row.hold_until, status, paymentStatus: row.payment_status,
     provider: row.provider, duration: (row.ends - row.starts) / 60, courtId: row.court_id,
     checkoutUrl: status === 'pending' ? row.checkout : null,

@@ -52,7 +52,12 @@ test('imports 25 venue records with operating hours, ratings and supplied images
   assert.ok(venues.every((v) => Number.isFinite(v.lat) && Number.isFinite(v.lng) && v.map_url.startsWith('https://')));
   assert.deepEqual(venues.slice(4,6).map(({open,close}) => [open,close]), [['05:00','23:00'],['00:00','24:00']]);
   const allDay = (await request(`/venues/6/availability?date=${dateAt(1)}&duration=60`)).body[0];
-  assert.equal(allDay.slots.at(-1).end,'24:00');
+  const lastSlot = allDay.slots.at(-1);
+  assert.equal(lastSlot.end,'24:00');
+  const { body:midnightQuote } = await request('/quote', { body:{
+    courtId:allDay.id, date:dateAt(1), time:lastSlot.time, duration:60,
+  } });
+  assert.equal(midnightQuote.end,lastSlot.end);
   const { body:detail } = await request('/venues/4');
   assert.deepEqual(detail.directory_details.weekendRates.at(-1), { start:'16:00', end:'22:00', hourly:150000 });
   assert.match(detail.directory_details.courts[0].label, /\+10000 VND\/h/);
@@ -286,11 +291,14 @@ test('admin adds a verified venue, assigns a registered owner, and can add and c
   const other = await signUp(17);
   const admin = await request('/auth/login',{body:{login:'0900000000',password:adminPassword}});
   assert.equal(admin.body.role,'admin');
-  const created = await request('/manage/venues',{cookie:admin.cookie,body:{name:'Cụm thử quản trị',area:'Thái Nguyên',
-    address:'Địa chỉ kiểm tra',lat:21.6,lng:105.8,open:'07:00',close:'22:00',price:160000,ownerPhone:owner.body.phone,verified:true}});
+  const venueData = { name:'Cụm thử quản trị',area:'Thái Nguyên',address:'Địa chỉ kiểm tra',lat:21.6,lng:105.8,
+    open:'07:00',close:'22:00',price:160000,ownerPhone:owner.body.phone,verified:true };
+  const created = await request('/manage/venues',{cookie:admin.cookie,body:{...venueData,active:false}});
   assert.equal(created.status,201);
   const id = created.body.id;
   assert.equal((await request('/manage/venues',{cookie:owner.cookie})).body[0].id,id);
+  assert.equal((await request(`/venues/${id}`)).status,404);
+  assert.equal((await request(`/manage/venues/${id}`,{method:'PUT',cookie:admin.cookie,body:{...venueData,active:true}})).status,200);
   assert.equal((await request(`/manage/venues/${id}/courts`,{cookie:other.cookie,body:{name:'Sân Hải'}})).status,403);
   const court = (await request(`/manage/venues/${id}/courts`,{cookie:owner.cookie,body:{name:'Sân Hải'}})).body;
   assert.equal((await request(`/venues/${id}`)).body.courts.length,2);

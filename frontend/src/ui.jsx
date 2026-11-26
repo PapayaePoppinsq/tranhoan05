@@ -42,9 +42,9 @@ export function VenueRating({ venue }) {
     {venue.rating_count != null && <small>({venue.rating_count})</small>}</span> : null;
 }
 
-export function CourtCard({ venue, saved, onSave, distance, date, after, demo }) {
+export function CourtCard({ venue, saved, onSave, distance, date, after, payment }) {
   const url = detailsUrl(venue.id, date, after);
-  const canBook = Boolean(venue.verified && venue.court_count > 0);
+  const canBook = Boolean(payment === 'payos' && venue.verified && venue.court_count > 0);
   const count = venue.court_count || venue.directory_details?.courtCount;
   return <article className="court-card"><div className="court-photo"><Link to={url} aria-label={`Xem ${venue.name}`}>
     <VenuePicture venue={venue}/></Link>
@@ -57,10 +57,10 @@ export function CourtCard({ venue, saved, onSave, distance, date, after, demo })
   </div><div className="court-body"><h3><Link to={url}>{venue.name}</Link></h3>
     <div className="court-keyfacts"><p className="court-address" title={venue.address}><MapPin size={15}/><span>{venue.address || venue.area || 'Thái Nguyên'}</span></p>
       <div className="court-meta"><span><Clock3 size={15}/>{venue.open === '00:00' && venue.close === '24:00' ? 'Mở 24 giờ' : `${venue.open}–${venue.close}`}</span>
-        {count > 0 && <span>{count} sân nhỏ{!canBook && ' theo danh bạ'}</span>}
+        {count > 0 && <span>{count} sân nhỏ{!venue.court_count && ' theo danh bạ'}</span>}
         {distance && <span title={distance.type === 'route' ? 'Theo đường đi' : 'Đường chim bay'}>{distance.km.toFixed(1)} km{distance.type === 'straight' ? ' đường chim bay' : ''}</span>}</div></div>
-    <div className="court-bottom"><div>{venue.verified ? <><strong>{money(venue.price)}</strong><span> / giờ</span></> :
-      <span>{demo ? `Giá thử ${money(venue.price)}/giờ` : venue.directory_details ?
+    <div className="court-bottom"><div>{canBook ? <><strong>{money(venue.price)}</strong><span> / giờ</span></> :
+      <span>{payment === 'demo' ? `Giá thử ${money(venue.price)}/giờ` : venue.directory_details ?
         `Tham khảo từ ${money(venue.directory_details.prices.offPeak)}/giờ` : 'Chưa có giá xác minh'}</span>}</div><Link className="small-button" to={url}>{canBook ? 'Xem lịch' : 'Xem sân'}</Link></div>
   </div></article>;
 }

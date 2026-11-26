@@ -8,7 +8,8 @@ export const useSite = () => useContext(Context);
 export function SiteProvider({ children }) {
   const [userRevision, bumpUser] = useState(0), [favoriteRevision, bumpFavorites] = useState(0);
   const session = useApi('/auth/me', userRevision);
-  const config = useApi('/config');
+  const [configRevision, bumpConfig] = useState(0);
+  const config = useApi('/config', configRevision);
   const favorite = useApi(session.value ? `/favorites` : null, `${userRevision}:${favoriteRevision}`);
   const [origin, setOrigin] = useState(null), [overlay, setOverlay] = useState(null), [notice, setNotice] = useState('');
   const location = useLocation(), navigate = useNavigate();
@@ -23,6 +24,7 @@ export function SiteProvider({ children }) {
     } catch (error) { setNotice(error.message); }
   }
   return <Context.Provider value={{ user:session.value, sessionLoading:session.loading, sessionError:session.error,
-    config:config.value, origin, setOrigin, overlay, setOverlay, notice, setNotice, favorites:favorite.value ?? [],
+    config:config.value, configError:config.error, refreshConfig:() => bumpConfig((n) => n + 1),
+    origin, setOrigin, overlay, setOverlay, notice, setNotice, favorites:favorite.value ?? [],
     favoriteLoading:favorite.loading, saveVenue, refreshUser:() => bumpUser((n) => n + 1) }}>{children}</Context.Provider>;
 }

@@ -1,12 +1,13 @@
 import { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { detailsUrl } from './api';
 
 export const mapCenter = [21.5902, 105.8294];
 const pin = L.divIcon({ className:'map-pin', html:'<b></b>', iconSize:[29,29], iconAnchor:[14,28], popupAnchor:[0,-27] });
 const hasPoint = (point) => point?.lat != null && point?.lng != null;
 
-export function CourtMap({ venues = [], origin, route, point, onPick, className = '' }) {
+export function CourtMap({ venues = [], origin, route, point, onPick, className = '', date, after }) {
   const element = useRef(null), instance = useRef(null), layers = useRef(null), pickHandler = useRef(onPick);
   pickHandler.current = onPick;
   useEffect(() => {
@@ -31,7 +32,7 @@ export function CourtMap({ venues = [], origin, route, point, onPick, className 
       const popup = document.createElement('div');
       const label = document.createElement('strong'); label.textContent = venue.name;
       const address = document.createElement('p'); address.textContent = venue.address;
-      const link = document.createElement('a'); link.href = `/san/${venue.id}`; link.textContent = 'Xem sân và lịch trống';
+      const link = document.createElement('a'); link.href = detailsUrl(venue.id, date, after); link.textContent = 'Xem chi tiết sân';
       popup.append(label, address, link);
       L.marker(coordinates, { icon:pin, title:venue.name, alt:venue.name }).bindPopup(popup).addTo(group);
     }
@@ -53,6 +54,6 @@ export function CourtMap({ venues = [], origin, route, point, onPick, className 
     if (onPick) map.__pickerReady = true;
     if (bounds.length > 1) map.fitBounds(bounds, { padding:[28,28], maxZoom:15 });
     else if (bounds.length === 1) map.setView(bounds[0], 15);
-  }, [venues, origin, route, point, onPick]);
+  }, [venues, origin, route, point, onPick, date, after]);
   return <div className={`map ${className}`} ref={element} aria-label="Bản đồ sân pickleball" />;
 }

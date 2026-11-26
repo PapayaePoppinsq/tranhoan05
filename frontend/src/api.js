@@ -36,7 +36,7 @@ export function useApi(path, revision = 0) {
     api(path, { signal: controller.signal }).then((value) => {
       if (!controller.signal.aborted) setState({ key, value, error: '', loading: false });
     },
-      (error) => { if (!controller.signal.aborted) setState({ key, value: null, error: error.message, loading: false }); });
+      (error) => { if (!controller.signal.aborted) setState({ key, value: null, error: error.message, status:error.status, loading: false }); });
     return () => controller.abort();
   }, [path, key]);
   return path && state.key === key ? state : { value: null, error: '', loading: Boolean(path) };
