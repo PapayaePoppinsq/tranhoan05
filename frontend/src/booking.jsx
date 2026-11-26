@@ -118,10 +118,10 @@ function DetailPage({ id }) {
       {routeError && <p className="muted">{routeError}</p>}
       <div className="form-actions"><RouteLink venue={venue} origin={site.origin}/><button className="button secondary"
         onClick={() => site.setOverlay('position')}><MapPin size={17}/>{site.origin ? 'Đổi điểm xuất phát' : 'Chọn điểm xuất phát'}</button></div></section>}
-    <div className={canBook ? 'detail-columns' : 'detail-columns schedule-only'}><section className="panel schedule"><div className="section-heading"><h2>{canBook ? 'Chọn lịch chơi' : 'Đặt sân trực tuyến'}</h2>
-      {canBook && <><label className="sr-only" htmlFor="booking-date">Chọn ngày khác</label><input id="booking-date" type="date" min={today()} max={today(30)}
-        value={date} onChange={(e) => chooseDate(e.target.value)}/></>}</div>
-      {catalogOnly && <p className="muted">Chưa tải được lịch. Dùng số liên hệ của sân để hỏi giờ còn trống.</p>}
+    {venue.directory_details && <DirectoryDetails details={venue.directory_details}/>}
+    <div className="detail-columns"><section className="panel schedule"><div className="section-heading"><h2>Chọn lịch chơi</h2>
+      <label className="sr-only" htmlFor="booking-date">Chọn ngày khác</label><input id="booking-date" type="date" min={today()} max={today(30)}
+        value={date} disabled={!canBook} onChange={(e) => chooseDate(e.target.value)}/></div>
       {canBook && <DateStrip date={date} onChange={chooseDate}/>}
       {canBook && <div className="form-split schedule-filters"><label>Sân nhỏ<select value={court?.id ?? (venue.courts.some((item) => item.id === courtId) ? courtId : venue.courts[0].id)}
         onChange={(e) => {setTouched(true);setCourtId(Number(e.target.value));setSelected(null);}}><option value="" disabled>Chọn sân nhỏ</option>
@@ -142,7 +142,7 @@ function DetailPage({ id }) {
       {!catalogOnly && !canBook && !venue.courts.length && <p className="muted">Chưa có sân nhỏ nào mở lịch trực tuyến.</p>}
       {slotData.loading && canBook ? <Loading>Đang kiểm tra giờ trống…</Loading> : canBook && court ? <>
         <h3 className="slot-heading">Giờ bắt đầu – kết thúc <small>Giá mỗi khung đã tính theo thời lượng bạn chọn</small></h3>
-        <div className="slot-legend"><span><b/> Còn trống</span><span className="booked"><b/> Đã đặt</span><span className="held"><b/> Đang giữ</span><span className="past"><b/> Đã qua</span></div>
+        <div className="slot-legend"><span><b/> Còn trống</span><span className="booked"><b/> Đã đặt</span><span className="held"><b/> Đang giữ</span></div>
         {!court.slots.length && <p className="muted">Thời lượng này vượt quá giờ hoạt động.</p>}
         <div className="slots">{court.slots.map((slot) => <button type="button" key={slot.time}
           className={`slot ${slot.status} ${current?.time === slot.time ? 'picked' : ''}`}
@@ -152,19 +152,17 @@ function DetailPage({ id }) {
         {targetTime && !touched && !current && court.slots.find((slot) => slot.time === targetTime && slot.status === 'available') &&
           <button className="text-button" onClick={() => {setTouched(true);setCourtId(court.id);setSelected(targetTime);}}>Chọn khung tìm kiếm {targetTime}</button>}
       </> : canBook && !slotData.error && <p className="muted">Hiện chưa tải được lịch đặt cho sân nhỏ này.</p>}
-    </section>{canBook && <aside className="panel summary"><h2>Đơn của bạn</h2><p className="muted">{venue.name}</p><dl className="summary-list">
+    </section><aside className="panel summary"><h2>Đơn của bạn</h2><p className="muted">{venue.name}</p><dl className="summary-list">
       <div><dt>Ngày</dt><dd>{longDate(date)}</dd></div><div><dt>Sân nhỏ</dt><dd>{court?.name || 'Chưa chọn'}</dd></div>
       <div><dt>Giờ chơi</dt><dd>{current ? `${current.time}–${current.end}` : 'Chưa chọn'}</dd></div>
       <div><dt>Thời lượng</dt><dd>{duration} phút</dd></div>
-      <div><dt>{site.config.demo ? 'Đơn giá thử' : 'Đơn giá trực tuyến'}</dt><dd>{money(venue.price)}/giờ</dd></div></dl>
+      {canBook && <div><dt>{site.config.demo ? 'Đơn giá thử' : 'Đơn giá trực tuyến'}</dt><dd>{money(venue.price)}/giờ</dd></div>}</dl>
       {current && proposed && <p className="demo-caption">Gợi ý đặt nhanh · {proposed.reason}. Bạn có thể đổi sân hoặc giờ.</p>}
+      {venue.directory_details && canBook && <p className="rate-disclaimer">Bảng giá theo khung giờ ở trên lấy từ danh bạ để tham khảo. Số tiền đặt trực tuyến cho khung đã chọn được hiển thị bên dưới.</p>}
       <div className="total" aria-live="polite"><span>Giá cho khung đã chọn</span><strong>{current ? money(current.amount) : '—'}</strong></div>
       {review ? <Link className="button primary wide" to={review}>Xem lại đơn</Link> :
         <button className="button primary wide" disabled>Chọn khung giờ</button>}
-    </aside>}</div>
-    {venue.directory_details && <DirectoryDetails details={venue.directory_details}/>}
-    {review && <div className="mobile-booking-action"><div><span>{current.time}–{current.end}</span><strong>{money(current.amount)}</strong></div>
-      <Link className="button primary" to={review}>Xem lại đơn</Link></div>}
+    </aside></div>
   </div>;
 }
 

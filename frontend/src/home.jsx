@@ -71,23 +71,22 @@ export function Home() {
   }
   return <>
     <section className="hero" aria-labelledby="home-title"><div className="shell hero-inner">
-      <div className="hero-copy"><p className="hero-place"><MapPin size={16}/> Thái Nguyên</p>
-        <h1 id="home-title">Tìm sân<br className="hero-break"/> pickleball</h1>
-        <p className="hero-description">Xem sân gần bạn, so sánh giá và chọn giờ chơi.</p>
-        <div className="hero-actions"><button className="button glass" onClick={() => site.setOverlay('quick')}><Zap size={18}/> Đặt nhanh thông minh</button></div>
-      </div>
-      <div className="hero-media"><img src="/images/san-thuc-te/4-0d494a8bb10a.webp" alt="Người chơi tại CLB Pickleball Quyết Thắng" fetchPriority="high"/></div>
-      <form className="search-panel" onSubmit={search} aria-label="Tìm sân pickleball">
+      <div className="hero-copy"><div className="hero-place"><MapPin size={14}/> PICKLEBALL TẠI THÁI NGUYÊN</div>
+        <h1 id="home-title">Tìm đúng sân.<br/><em>Ra sân đúng giờ.</em></h1>
+        <p>Xem sân pickleball tại Thái Nguyên, chọn giờ phù hợp và đặt ngay trên web.</p>
+        <div className="hero-actions"><a className="button lime" href="#tim-san"><Search size={20}/> Tìm sân ngay</a>
+          <button className="button glass" onClick={() => site.setOverlay('quick')}><Zap size={18}/> Đặt nhanh thông minh</button></div>
+      </div></div></section>
+
+    <div className="shell home-content"><form className="search-panel" onSubmit={search} aria-label="Tìm sân pickleball">
       <label><Search size={19}/><span>Tìm sân<input type="search" placeholder="Tên sân, địa chỉ…" value={draft.query} onChange={(e) => update('query',e.target.value)}/></span></label>
       <label><MapPin size={19}/><span>Khu vực<select value={draft.area} onChange={(e) => update('area',e.target.value)}><option value="">Tất cả khu vực</option>
         {areas.map((a) => <option key={a}>{a}</option>)}</select></span></label>
       <label><CalendarDays size={19}/><span>Ngày chơi<input aria-label="Ngày chơi" type="date" min={today()} max={today(30)} value={draft.date} onChange={(e) => update('date',e.target.value)}/></span></label>
       <label><Clock3 size={19}/><span>Sau giờ<input aria-label="Giờ bắt đầu tìm" type="time" value={draft.after} onChange={(e) => update('after',e.target.value)}/></span></label>
       <button className="button primary"><Search size={18}/> Tìm sân</button>
-      </form>
-    </div></section>
+    </form>
 
-    <div className="shell home-content">
     <section id="tim-san" className="court-section" aria-labelledby="court-list-heading">
       <div className="section-heading"><div><h2 id="court-list-heading">Sân pickleball</h2>
         <p>{source.loading ? 'Đang tải danh sách sân…' : `${venues.length} cụm sân${filter.area ? ` tại ${filter.area}` : ' tại Thái Nguyên'}`}</p></div>
@@ -102,15 +101,16 @@ export function Home() {
         <label className="chip select-chip"><SlidersHorizontal size={15}/><select aria-label="Giá mỗi giờ" value={price} onChange={(e) => setPrice(e.target.value)}>
           <option value="">Mức giá</option><option value="100000">Tối đa 100.000 ₫/giờ</option><option value="150000">Tối đa 150.000 ₫/giờ</option>
           <option value="200000">Tối đa 200.000 ₫/giờ</option></select></label>
-      </div><div className="view-tools"><label className="sort-control">Sắp xếp<select value={sort} onChange={(e) => {
+      </div><div className="view-tools"><select aria-label="Sắp xếp sân" value={sort} onChange={(e) => {
         setSort(e.target.value); if (e.target.value === 'near' && !site.origin) site.setOverlay('position');
-      }}><option value="default">Ưu tiên sân đã lưu</option><option value="near">Gần nhất</option><option value="price">Giá thấp nhất</option></select></label>
+      }}><option value="default">Ưu tiên sân đã lưu</option><option value="near">Gần nhất</option><option value="price">Giá thấp nhất</option></select>
         <div className="view-toggle"><button aria-label="Danh sách" aria-pressed={view === 'list'} onClick={() => setView('list')}><LayoutGrid size={17}/></button>
           <button aria-label="Bản đồ" aria-pressed={view === 'map'} onClick={() => setView('map')}><Map size={17}/></button></div></div></div>
       {catalogOnly && <div className="info-box" role="status"><strong>Đang hiển thị danh bạ sân</strong>
         <p>Trang này chưa kết nối backend nên chưa có lịch trống, đăng nhập hoặc đặt sân trực tuyến. Khoảng cách hiển thị là đường chim bay; mở từng sân để xem bản đồ và số liên hệ.</p></div>}
-      {site.config?.payment === 'off' && <p className="info-box" role="status">Đặt trực tuyến chưa mở. Bạn có thể xem giá tham khảo và thông tin liên hệ của từng sân.</p>}
-      {site.config?.demo && <p className="demo-caption">Chế độ thử · Giá và lịch của sân chưa xác minh chỉ dùng để mô phỏng.</p>}
+      {site.config?.payment === 'off' && <div className="info-box" role="status"><strong>Đặt sân trực tuyến chưa mở</strong>
+        <p>Bạn có thể xem giá tham khảo và thông tin liên hệ của từng sân.</p></div>}
+      <p className="demo-caption">Thông tin sân và đánh giá lấy từ CSV.{site.config?.demo ? ' Giá và lịch đặt của sân chưa xác minh dùng để chạy thử.' : ''}</p>
       {distanceError && <p className="info-box" role="status">Chưa tính được khoảng cách. {distanceError} <button className="text-button" onClick={() => reload((n) => n + 1)}>Thử lại</button></p>}
       {source.error ? <><Alert>{source.error}</Alert><button className="button secondary" onClick={() => reload((n) => n + 1)}>Thử lại</button></> :
         source.loading ? <Loading/> : !venues.length ? <Empty title="Chưa tìm thấy sân phù hợp" action={<button className="button secondary" onClick={reset}>Xóa bộ lọc</button>}/> :
