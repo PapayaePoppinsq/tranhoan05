@@ -83,6 +83,6 @@ Sau khi khách xác nhận giữ chỗ, web tạo link payOS và hiển thị Vi
 
 `backend/data/thai-nguyen.csv` là file danh bạ duy nhất, lấy từ `danh_sach_25_san_pickleball_thai_nguyen_day_du-v2.csv`. File có 25 cụm sân và 107 sân nhỏ. Trang chi tiết hiển thị loại sân, mặt sân, bảng giá theo ngày và giờ, danh sách sân nhỏ và phụ phí nếu có. Với dòng ghi cả một khung giờ và “Mở cả ngày”, lịch dùng khung giờ cụ thể. “Mở cả ngày (24/24)” dùng 00:00–24:00.
 
-`backend/data/catalog-photos.json` ghi ảnh đã chọn theo mã, tên và địa chỉ sân, nguồn đối chiếu và lý do bỏ trống. Có 18 ảnh chụp lưu trong `frontend/public/images/san-thuc-te/`. Bảy sân còn lại hiện sơ đồ với nhãn “Chưa có ảnh chụp sân” vì ảnh nguồn không đủ căn cứ gắn đúng địa điểm. Trên trang chi tiết, nút **Nguồn ảnh** mở liên kết đối chiếu.
+`backend/data/catalog-photos.json` ghi ảnh đã chọn theo mã, tên và địa chỉ sân, nguồn đối chiếu và lý do bỏ trống. Danh bạ đang dùng 19 ảnh chụp từ `frontend/public/images/san-thuc-te/`. Sáu sân còn lại hiện sơ đồ với nhãn “Chưa có ảnh chụp sân” vì ảnh nguồn không đủ căn cứ gắn đúng địa điểm. Trên trang chi tiết, nút **Nguồn ảnh** mở liên kết đối chiếu.
 
 Worker đồng bộ chi tiết CSV theo mã danh bạ vào các cụm sân hiện có. Giá và sân nhỏ trong CSV chỉ phục vụ tham khảo trên web và chatbot. Chế độ thử vẫn dùng một sân thử mỗi địa điểm với giá mô phỏng 100.000 ₫/giờ. Giá đặt thật và lịch trống lấy từ cấu hình vận hành sau khi quản trị viên xác minh.

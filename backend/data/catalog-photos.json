@@ -11,9 +11,10 @@
     "id": 2,
     "name": "Pickleball Thái Nguyên Xanh",
     "address": "HRVQ+3PG, Tổ 1, KDC số 10, Phường Phan Đình Phùng, TP. Thái Nguyên",
-    "cover": null,
-    "source": null,
-    "note": "CSV chỉ có thẻ giới thiệu Lool.vn."
+    "cover": "/images/san-thuc-te/2-4baeab0e10af.jpg",
+    "source": "https://danhsachvang.vn/xep-hang/san-pickleball-o-thai-nguyen",
+    "imageUrl": "https://danhsachvang.vn/wp-content/uploads/2026/10/san-pickleball-o-thai-nguyen-1791796687492.jpg",
+    "note": "Ảnh tại mục Pickleball Thái Nguyên Xanh có địa chỉ Tổ 1, KDC số 10. Số liên hệ trên bảng giá trong ảnh khớp với danh bạ."
   },
   {
     "id": 3,
@@ -67,9 +68,10 @@
     "id": 9,
     "name": "QT Pickleball & Beer",
     "address": "Số 44 Đường Việt Bắc, Phường Đồng Quang, TP. Thái Nguyên",
-    "cover": "/images/san-thuc-te/9-d3c066a01480.jpg",
-    "source": "https://media.sportnet.vn/venue/2175/san-pickleball-qt-6-1761188673.jpeg",
-    "imageUrl": "https://media.sportnet.vn/venue/2175/san-pickleball-qt-6-1761188673.jpeg"
+    "cover": "/images/san-thuc-te/9-e1fbcca176ab.webp",
+    "source": "https://shopvnb.com/san-pickleball-qt.html",
+    "imageUrl": "https://cdn.shopvnb.com/uploads/images/bai_viet/san-pickleball-qt-3-1732649984.webp",
+    "note": "Ảnh chụp mặt sân tại mục giới thiệu cụm QT, địa chỉ 44 Việt Bắc."
   },
   {
     "id": 10,
@@ -102,7 +104,7 @@
     "address": "HR95+2XW, Khu dân cư số 6, Phường Thịnh Đán, TP. Thái Nguyên",
     "cover": null,
     "source": null,
-    "note": "CSV chỉ có logo và thẻ giới thiệu."
+    "note": "CSV chỉ có logo và thẻ giới thiệu ghi HRG7+VC5, khác mã địa điểm HR95+2XW của sân trong danh bạ."
   },
   {
     "id": 14,

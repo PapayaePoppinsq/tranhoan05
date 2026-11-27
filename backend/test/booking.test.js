@@ -35,7 +35,7 @@ const signUp = (n, name = `Khách ${n}`) => request('/auth/register', { body:{ n
 test('imports 25 venue records with operating hours, ratings and supplied images', async () => {
   const { body:venues } = await request('/venues');
   assert.equal(venues.length, 25);
-  assert.equal(venues.filter((venue) => venue.image).length,18);
+  assert.equal(venues.filter((venue) => venue.image).length,19);
   assert.equal(venues[0].name,'Sân Vin Pickleball Thanh Niên 2');
   assert.equal(venues[0].lat,21.5794);
   assert.equal(venues[0].rating,5);
@@ -43,10 +43,12 @@ test('imports 25 venue records with operating hours, ratings and supplied images
   assert.equal(venues[0].area,'Tân Thịnh');
   assert.equal(venues[0].court_count,0);
   assert.equal(venues.reduce((count, venue) => count + venue.directory_details.courtCount, 0), 107);
-  assert.equal(venues[1].image,'');
+  assert.match(venues[1].image,/\/san-thuc-te\/2-/);
+  assert.match(venues[1].photo_source,/danhsachvang\.vn/);
   assert.match(venues[6].image,/\/san-thuc-te\/7-/);
   assert.match(venues[10].image,/\/san-thuc-te\/11-/);
   assert.match(venues[7].photo_source,/bvdktuthainguyen.gov.vn/);
+  assert.match(venues[8].photo_source,/shopvnb\.com\/san-pickleball-qt\.html$/);
   assert.equal(venues[18].image,'');
   assert.match(venues[24].image,/\/san-thuc-te\/25-/);
   assert.ok(venues.every((v) => Number.isFinite(v.lat) && Number.isFinite(v.lng) && v.map_url.startsWith('https://')));

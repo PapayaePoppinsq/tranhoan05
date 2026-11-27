@@ -23,14 +23,16 @@ export function Dialog({ title, icon, onClose, children, className = '' }) {
 
 export function VenuePicture({ venue }) {
   const [failed, setFailed] = useState(null);
-  if (!venue.image || failed === venue.image) return <div className="venue-photo-missing" role="img" aria-label={`Chưa có ảnh chụp của ${venue.name}`}>
+  const unavailable = Boolean(venue.image && failed === venue.image);
+  if (!venue.image || unavailable) return <div className="venue-photo-missing" role="img"
+    aria-label={unavailable ? `Không tải được ảnh của ${venue.name}` : `Chưa có ảnh chụp của ${venue.name}`}>
     <svg className="venue-court-graphic" viewBox="0 0 360 180" aria-hidden="true" focusable="false">
       <rect x="20" y="14" width="320" height="152" rx="5" fill="#c6dfc5"/>
       <rect x="34" y="28" width="292" height="124" fill="none" stroke="#f9fcf7" strokeWidth="4"/>
       <path d="M110 28v124m140-124v124M34 90h292M180 28v62" fill="none" stroke="#f9fcf7" strokeWidth="4"/>
       <path d="M180 20v140" fill="none" stroke="#356847" strokeWidth="5" strokeDasharray="4 5"/>
     </svg>
-    <span>Chưa có ảnh chụp sân</span>
+    <span>{unavailable ? 'Ảnh sân chưa tải được' : 'Chưa có ảnh chụp sân'}</span>
   </div>;
   return <img loading="lazy" src={venue.image} alt={venue.image_sample ? 'Ảnh minh họa' : `Ảnh danh bạ ${venue.name}`}
     onError={() => setFailed(venue.image)} />;

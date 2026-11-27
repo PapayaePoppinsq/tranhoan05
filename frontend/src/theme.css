@@ -113,6 +113,10 @@ select option { background: #202431; color: #f5f7fa; }
 .venue-photo-missing, .detail-hero .venue-photo-missing { background: #202532; color: #afbecb; }
 .venue-photo-missing span { background: #131722e8; color: #cbd6df; border-radius: 2px; }
 .venue-court-graphic { filter: grayscale(1) brightness(1.5); opacity: .52; }
+.court-photo .venue-photo-missing { align-content: center; gap: 10px; }
+.court-photo .venue-court-graphic { width: min(45%, 148px); transform: none; }
+.court-photo .venue-photo-missing span { position: static; }
+.detail-hero .venue-photo-missing span { left: 14px; right: auto; }
 
 .detail-hero { height: clamp(280px, 31vw, 410px); background: #202532; }
 .detail-hero::before { background: linear-gradient(90deg, #0c111cea, #0d1323a3 48%, #10121b16); }
