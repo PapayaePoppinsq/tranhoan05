@@ -144,15 +144,16 @@
     "address": "Số 112 Đường Hoàng Ngân, Phường Phan Đình Phùng, TP. Thái Nguyên",
     "cover": null,
     "source": null,
-    "note": "Ảnh banner trong CSV ghi Nam Định. Không dùng ảnh cùng album cho sân Thái Nguyên."
+    "note": "Google Maps xác nhận đúng tên và địa chỉ 112 Hoàng Ngân, mã HRPW+2C, nhưng chưa có ảnh chụp sân. Banner trong CSV thuộc sân ở Nam Định."
   },
   {
     "id": 19,
     "name": "H83 Pickleball",
     "address": "HRWH+57R, Ngõ 100 Phù Liễn, Phường Hoàng Văn Thụ, TP. Thái Nguyên",
-    "cover": null,
-    "source": null,
-    "note": "Ảnh mang tên H83 Bắc Sơn, trong khi dòng CSV ghim sân H83 ở ngõ 100 Phù Liễn. Hai ảnh khác trùng với dòng Bắc Sơn Club."
+    "cover": "/images/san-thuc-te/19-b220472386a7.jpg",
+    "source": "https://ankhanh.thainguyen.gov.vn/tin-tuc-su-kien/giai-pickleball-tranh-cup-sypik-nam-2026-se-dien-ra-tu-ngay-08-4-den-12-4-257166",
+    "note": "Ảnh thi đấu được cổng thông tin địa phương chú thích là sân Pickleball H83, đường Bắc Sơn. Ghim H83 HRWH+57R nằm cách số 158 Bắc Sơn khoảng 130 m; nguồn dùng hai cách ghi địa chỉ.",
+    "imageUrl": "https://storage-vnportal.vnpt.vn/gov-tnn/10289/FileQuanTriTinTuc/image.639110694620955535.jpg"
   },
   {
     "id": 20,

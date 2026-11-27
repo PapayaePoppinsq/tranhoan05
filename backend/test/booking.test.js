@@ -35,7 +35,7 @@ const signUp = (n, name = `Khách ${n}`) => request('/auth/register', { body:{ n
 test('imports 25 venue records with operating hours, ratings and supplied images', async () => {
   const { body:venues } = await request('/venues');
   assert.equal(venues.length, 25);
-  assert.equal(venues.filter((venue) => venue.image).length,19);
+  assert.equal(venues.filter((venue) => venue.image).length,20);
   assert.equal(venues[0].name,'Sân Vin Pickleball Thanh Niên 2');
   assert.equal(venues[0].lat,21.5794);
   assert.equal(venues[0].rating,5);
@@ -49,7 +49,8 @@ test('imports 25 venue records with operating hours, ratings and supplied images
   assert.match(venues[10].image,/\/san-thuc-te\/11-/);
   assert.match(venues[7].photo_source,/bvdktuthainguyen.gov.vn/);
   assert.match(venues[8].photo_source,/shopvnb\.com\/san-pickleball-qt\.html$/);
-  assert.equal(venues[18].image,'');
+  assert.match(venues[18].image,/\/san-thuc-te\/19-/);
+  assert.match(venues[18].photo_source,/ankhanh\.thainguyen\.gov\.vn/);
   assert.match(venues[24].image,/\/san-thuc-te\/25-/);
   assert.ok(venues.every((v) => Number.isFinite(v.lat) && Number.isFinite(v.lng) && v.map_url.startsWith('https://')));
   assert.deepEqual(venues.slice(4,6).map(({open,close}) => [open,close]), [['05:00','23:00'],['00:00','24:00']]);
